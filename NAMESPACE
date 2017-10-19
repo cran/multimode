@@ -1,0 +1,8 @@
+useDynLib(multimode, BinDist2,.registration = TRUE)
+importFrom(rootSolve,uniroot.all)
+importFrom(ks,kcde,kdde,kde)
+importFrom(diptest,dip,dip.test)
+importFrom("graphics","box","image", "legend", "lines", "plot")
+importFrom("stats", "approx", "density", "dist", "dnorm", "fft","integrate", "optimize", "pnorm", "qnorm", "quantile","rbeta", "rnorm", "rt", "runif", "sd")
+importFrom("grDevices", "grey")
+export(bw.crit,excessmass,locmodes,modeforest,modetest,modetree,nmodes,sizer)
