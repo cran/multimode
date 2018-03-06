@@ -2,8 +2,8 @@ Encoding: UTF-8
 Package: multimode
 Type: Package
 Title: Mode Testing and Exploring
-Version: 1.0
-Date: 2017-10-17
+Version: 1.1
+Date: 2018-03-06
 Author: Jose Ameijeiras-Alonso [aut,cre],
   Rosa M. Crujeiras [aut], 
   Alberto Rodríguez-Casal [aut],
@@ -17,6 +17,7 @@ NeedsCompilation: yes
 LazyData: TRUE
 Imports: diptest, ks, rootSolve
 Suggests: nor1mix
-Packaged: 2017-10-18 18:28:57 UTC; Usuario
+URL: https://arxiv.org/abs/1803.00472/
+Packaged: 2018-03-06 11:37:35 UTC; Usuario
 Repository: CRAN
-Date/Publication: 2017-10-19 13:50:45 UTC
+Date/Publication: 2018-03-06 12:51:03 UTC

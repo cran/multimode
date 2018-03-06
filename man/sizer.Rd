@@ -25,7 +25,7 @@ xlab=NULL,ylab=NULL,addlegend=TRUE,poslegend="topright")
   \item{logbw}{ Logical, if \code{TRUE} the plot displays and returns the log10 bandwidths. Default \code{logbw=FALSE}.}
     \item{from}{ First plotted value of the variable. Default is below the data minimum.}
     \item{to}{ Last plotted value of the variable. Default is above the data maximum.}
-    \item{col.sizer}{ Colors employed in the SiZer map. The first color indicates where the smoothed curve is significantly increasing, the second where it is not significantly different from zero, the third where it is significantly negative and the forth where the data are too sparse for meaningful inference. Default \code{col.sizer=c("red","orchid","blue","grey")}.}
+    \item{col.sizer}{ Colors employed in the SiZer map for indicating the behaviour of the smoothed curve. The first color indicates where it is significantly increasing, the second where it is not significantly different from zero, the third where it is significantly negative and the forth where the data are too sparse for meaningful inference. Default \code{col.sizer=c("red","orchid","blue","grey")}.}
     \item{xlab}{ A title for the x axis. See \code{title}.}
     \item{ylab}{ A title for the y axis. See \code{title}.}
     \item{addlegend}{ Logical, if \code{TRUE} the legend is displayed. Default \code{TRUE}.}

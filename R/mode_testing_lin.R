@@ -126,12 +126,6 @@ bw.crit=function(data,mod0=1,lowsup=-Inf,uppsup=Inf,n=2^15,tol=10^(-5)){
     lowsup=-Inf
   }
 
-  if(((lowsup>-Inf)&(uppsup==Inf))|((lowsup==-Inf)&(uppsup<Inf))){
-    warning("Both 'lowsup' and 'uppsup' must be finite or infinite. Default values of 'lowsup' and 'uppsup' were used")
-    uppsup=Inf
-    lowsup=-Inf
-  }
-
   if(lowsup>uppsup){
     warning("Argument 'uppsup' must be greater than 'lowsup'. They were been interchanged")
     lowsup2=lowsup
@@ -213,18 +207,30 @@ bw.crit=function(data,mod0=1,lowsup=-Inf,uppsup=Inf,n=2^15,tol=10^(-5)){
 
 #Critical bandwidth test (Silverman, 1981)
 
-cbws=function(data,mod0=1,B=500,n=2^10,tol=10^(-5)){
+cbws=function(data,mod0=1,B=500,methodsi=1,n=2^10,tol=10^(-5)){
 
   #Test statistic
   cbw=bw.crit(data,mod0,n=n,tol=tol)
 
   #Bootstrap replicas
   cbwB=numeric()
+
+  if(methodsi==1){
   for(i in 1:B){
     eps=rnorm(length(data),0,cbw)
     samp=sample(data,length(data),replace=T)
     dataB=samp+eps
-    cbwB[i]=bw.crit(dataB,mod0,n=n,tol=tol)
+    dataB2=sqrt(1+(cbw/sd(dataB))^2)*dataB
+    cbwB[i]=bw.crit(dataB2,mod0,n=n,tol=tol)
+  }
+  }
+  if(methodsi==2){
+    for(i in 1:B){
+      eps=rnorm(length(data),0,cbw)
+      samp=sample(data,length(data),replace=T)
+      dataB=samp+eps
+      cbwB[i]=bw.crit(dataB,mod0,n=n,tol=tol)
+    }
   }
 
   #P-value
@@ -377,9 +383,9 @@ cbwcvm=function(data,mod0=1,B=500,n=2^10,tol=10^(-5)){
 
 
 
-#Excess of mass statistic
+#Exact version of excess mass statistic
 
-excessmass=function(data,mod0=1){
+excessmassex=function(data,mod0=1){
 
 
   if (!is.numeric(data)) stop("Argument 'data' must be numeric")
@@ -396,7 +402,7 @@ excessmass=function(data,mod0=1){
     distance=dist(data)
     mindist=min(distance[distance>0])
     data=data+runif(ndata,-mindist/2,mindist/2)
-    warning("A modification of the data was made in order to compute the excess of mass statistic")
+    warning("A modification of the data was made in order to compute the excess mass statistic")
   }
 
 
@@ -614,12 +620,280 @@ excessmass=function(data,mod0=1){
 
 
 
+
 ###############################################################
 ###############################################################
 
 
 
-# Excess of mass test (Cheng and Hall, 1998)
+
+#Approximated version of excess mass statistic
+
+excessmassapp=function(data,mod0=2,gridsize=c(20,20)){
+
+  if (!is.numeric(data)) stop("Argument 'data' must be numeric")
+  if (sum(is.na(data))>0) warning("Missing values were removed")
+  data=data[!is.na(data)]
+  ndata=length(data)
+  if (ndata==0) stop("No observations (at least after removing missing values)")
+  if (!is.numeric(mod0)) stop("Argument 'mod0' must be a positive integer number")
+  if ((length(mod0)!=1)|(mod0%%1!=0) | (mod0<=0)) stop("Argument 'mod0' must be a positive integer number")
+  if (!is.numeric(gridsize)){
+    warning("Argument 'gridsize' must be numeric. Default values of 'gridsize' were used")
+    gridsize=c(20,20)
+  }else{
+    if(length(gridsize)!=2){
+      warning("Argument 'gridsize' must be of length two. Default value of 'gridsize' were used")
+      gridsize=c(20,20)
+    }
+  }
+
+  #If there are duplicated data a modification is made
+
+  if((sum(duplicated(data))>0)|(sum(duplicated(diff(sort(data)))))){
+    distance=dist(data)
+    mindist=min(distance[distance>0])
+    data=data+runif(ndata,-mindist/2,mindist/2)
+    warning("A modification of the data was made in order to compute the excess mass statistic")
+  }
+
+  lenposx=gridsize[1]
+  lenlambda=gridsize[2]
+
+  data=sort(data)
+  ndata=length(data)
+  posx=quantile(data,seq(0,1,len=lenposx),type=1)
+  maxdist=diff(range(data))
+
+  lambdas=numeric()
+  lambi=0
+
+  for(modtemp in mod0:(mod0+1)){
+
+    maxiter=choose(lenposx,2*modtemp)
+    tro=(.Fortran("calcdist",dataor=as.double(data),ndata=as.integer(ndata),modtemp=as.integer(modtemp),maxiter=as.integer(maxiter),posx=as.double(posx),lenposx=as.integer(lenposx),distCext=as.double(rep(maxdist,ndata))))
+    distCext=tro$distCext
+
+    for(i in 1:(length(distCext)-1)){
+      distCext[i]=min(distCext[i:length(distCext)])
+    }
+
+    qk1=1
+    dqk1=distCext[length(distCext)]
+    control=0
+    PCext=(1:ndata)/ndata
+
+    while(control==0){
+      lambi=lambi+1
+      matlambda=(qk1-PCext[1:(ndata*qk1-1)])/(dqk1-distCext[1:(ndata*qk1-1)])
+      lambdas[lambi]=min(matlambda[matlambda>0],na.rm=T)
+      whichlam=which(matlambda==lambdas[lambi])[1]
+      qk1=(whichlam[1])/ndata
+      dqk1=distCext[whichlam[1]]
+      if(qk1<=((1+modtemp)/ndata)){control=1}
+    }
+
+  }
+
+
+  elememl1=list()
+  PC=matrix(NA,nrow=ndata,ncol=ndata)
+  distC=matrix(NA,nrow=ndata,ncol=ndata)
+
+  PC[row(PC)+col(PC)<=(ndata+1)]=(row(PC))[row(PC)+col(PC)<=(ndata+1)] /ndata
+
+  distC[row(PC)+col(PC)<=(ndata+1)]=outer(data,data,"-")[row(PC)-col(PC)>=0]
+  maxlambda=1/(ndata*min(distC[distC>0],na.rm=T))
+
+
+  distCext=apply(distC,1,function(x)min(x,na.rm=T))
+
+  qk1=1
+  dqk1=distCext[length(distCext)]
+  control=0
+  PCext=(1:ndata)/ndata
+
+  while(control==0){
+    lambi=lambi+1
+    matlambda=(qk1-PCext[1:(ndata*qk1-1)])/(dqk1-distCext[1:(ndata*qk1-1)])
+    lambdas[lambi]=min(matlambda[matlambda>0],na.rm=T)
+    whichlam=which(matlambda==lambdas[lambi])[1]
+    qk1=(whichlam[1])/ndata
+    dqk1=distCext[whichlam[1]]
+    if(qk1<=((1+modtemp)/ndata)){control=1}
+  }
+
+
+  diffem=function(lambda,mod0){
+
+    #Excess mass for one mode
+
+    eml1=PC-lambda*distC
+    eml1max=max(eml1,na.rm=T)
+    elememl1[[1]]=which(eml1==eml1max,arr.ind=T)[1,]
+    elememl1[[1]]=c(sum(elememl1[[1]])-1,elememl1[[1]][2])
+
+    #eml1maxtemp=eml1max
+    elememl1temp=elememl1
+
+    for(modtemp in 1:mod0){
+
+      eml1maxtemp=0
+
+      #In one interval, remove one subinterval
+
+      for(lm in 1:modtemp){
+
+        if(diff(elememl1[[lm]])<0){
+
+          distC2a=matrix(NA,nrow=ndata,ncol=ndata)
+          distC2a[((row(distC)+col(distC)-1)<=elememl1[[lm]][1])&(col(distC)>=elememl1[[lm]][2])]=distC[((row(distC)+col(distC)-1)<=elememl1[[lm]][1])&(col(distC)>=elememl1[[lm]][2])]
+          eml2a=-PC[-ndata,]+lambda*distC2a[-1,]
+          eml2amax=max(eml2a,na.rm=T)
+          elememl2a=which(eml2a==eml2amax,arr.ind=T)[1,]
+          elememl2a=c(sum(elememl2a)-1,elememl2a[2])
+
+          eml1maxtempa=-eml2amax+eml1max
+
+          if(eml1maxtempa>eml1maxtemp){
+            eml1maxtemp=eml1maxtempa
+            elememl1temp[[lm]]=c(elememl2a[2],elememl1[[lm]][2])
+            elememl1temp[[modtemp+1]]=c(elememl1[[lm]][1],elememl2a[1])
+          }
+
+        }
+
+      }
+
+      #add one new interval
+
+      distC2b=distC
+
+      for(lm in 1:modtemp){
+        distC2b[((row(distC)+col(distC)-1)>=elememl1[[lm]][2])&(col(distC)<=elememl1[[lm]][1])]=NA
+      }
+
+      if(sum(!is.na(distC2b))>0){
+        eml2b=PC-lambda*distC2b
+        eml2bmax=max(eml2b,na.rm=T)
+        elememl2b=which(eml2b==eml2bmax,arr.ind=T)[1,]
+        elememl2b=c(sum(elememl2b)-1,elememl2b[2])
+
+        eml1maxtempb=eml2bmax+eml1max
+
+        if(eml1maxtempb>eml1maxtemp){
+          eml1maxtemp=eml1maxtempb
+          elememl1temp=elememl1
+          elememl1temp[[modtemp+1]]=elememl2b
+        }
+
+      }
+
+      elememl1=elememl1temp
+      diffem=eml1maxtemp-eml1max
+      eml1max=eml1maxtemp
+
+    }
+
+    return(diffem)
+
+
+  }
+
+
+  lambdas=sort(lambdas[lambdas<maxlambda])
+
+  emval1=numeric()
+
+  for(lit in 1:length(lambdas)){
+    emval1[lit]=diffem(lambdas[lit],mod0)
+  }
+
+  whichemval=which.max(emval1)
+  lambdas=c(0,lambdas,maxlambda)
+  lambdas2=seq(lambdas[whichemval],lambdas[whichemval+2],len=lenlambda+2)
+
+  lambdas2=lambdas2[2:(lenlambda+1)]
+
+  emval2=numeric()
+  for(lit in 1:lenlambda){
+    emval2[lit]=diffem(lambdas2[lit],mod0)
+  }
+
+
+  whichemval=which.max(emval2)
+  lambdas2=c(lambdas2[1],lambdas2,lambdas2[length(lambdas2)])
+  lambdas3=seq(lambdas2[whichemval],lambdas2[whichemval+2],len=lenlambda+2)
+
+  lambdas3=lambdas3[2:(lenlambda+1)]
+
+  emval3=c(max(emval1),max(emval2))
+  for(lit in 1:lenlambda){
+    emval3[lit+2]=diffem(lambdas3[lit],mod0)
+  }
+
+  return(max(emval3))
+
+}
+
+
+
+###############################################################
+###############################################################
+
+
+#Excess mass statistic
+
+excessmass=function(data,mod0=1,approximate=FALSE,gridsize=NULL){
+
+  if (!is.numeric(data)) stop("Argument 'data' must be numeric")
+  if (sum(is.na(data))>0) warning("Missing values were removed")
+  data=data[!is.na(data)]
+  ndata=length(data)
+  if (ndata==0) stop("No observations (at least after removing missing values)")
+  if (!is.numeric(mod0)) stop("Argument 'mod0' must be a positive integer number")
+  if ((length(mod0)!=1)|(mod0%%1!=0) | (mod0<=0)) stop("Argument 'mod0' must be a positive integer number")
+  if(approximate!=T&approximate!=F){
+    warning("Argument 'approximate' must be T or F. Default value of 'approximate' was used")
+    approximate=F
+  }
+  if(is.null(gridsize)){
+    gridsize=c(20,20)
+  }else{
+    if (approximate==FALSE){
+      warning("Argument 'gridsize' is not needed when 'approximate' is FALSE")
+    }
+    if (!is.numeric(gridsize)){
+    warning("Argument 'gridsize' must be numeric. Default values of 'gridsize' were used")
+    gridsize=c(20,20)
+  }else{
+    if(length(gridsize)!=2){
+      warning("Argument 'gridsize' must be of length two. Default value of 'gridsize' were used")
+      gridsize=c(20,20)
+    }
+    if(gridsize[1]>=ndata){
+      warning("First argument 'gridsize' should be lower than the sample size. Exact version of the excess mass is computed")
+      approximate=F
+    }
+  }
+  }
+
+  if(approximate==T){
+    return(excessmassapp(data,mod0,gridsize))
+  }else{
+    return(excessmassex(data,mod0))
+  }
+
+
+}
+
+  ###############################################################
+  ###############################################################
+
+
+
+
+# Excess mass test (Cheng and Hall, 1998)
 
 emch=function(data,B=500,n=2^15){
 
@@ -642,7 +916,7 @@ emch=function(data,B=500,n=2^15){
   d=abs(fdmodest)/(fmodest^3)
 
   #Computation of the test statistic
-  em=excessmass(data,1)
+  em=excessmass(data,1,approximate=FALSE)
 
   #Computation of the resamples
   emB=numeric()
@@ -652,7 +926,7 @@ emch=function(data,B=500,n=2^15){
     betaest=uniroot.all(fun1, c(1,256.25))
     for (j in 1:B){
       nuevdat=rbeta(ndata,betaest,betaest)
-      emB[j]=excessmass(nuevdat,1)
+      emB[j]=excessmass(nuevdat,1,approximate=FALSE)
     }
   }
 
@@ -663,7 +937,7 @@ emch=function(data,B=500,n=2^15){
     for (j in 1:B){
       nuevdat=rt(ndata,2*betaest-1)
       nuevdat=nuevdat/sqrt(2*betaest-1)
-      emB[j]=excessmass(nuevdat,1)
+      emB[j]=excessmass(nuevdat,1,approximate=FALSE)
     }
   }
 
@@ -696,6 +970,10 @@ locmodes=function(data,mod0=1,lowsup=-Inf,uppsup=Inf,n=2^15,tol=10^(-5),display=
   if (ndata==0) stop("No observations (at least after removing missing values)")
   if (!is.numeric(mod0)) stop("Argument 'mod0' must be a positive integer number")
   if ((length(mod0)!=1)|(mod0%%1!=0) | (mod0<=0)) stop("Argument 'mod0' must be a positive integer number")
+
+  if(lowsup==-Inf&uppsup==Inf){
+    warning("If the density function has an unbounded support, artificial modes may have been created in the tails")
+  }
 
   if (!is.numeric(lowsup)){
     warning("Argument 'lowsup' must be numeric. Default value of 'lowsup' was used")
@@ -1224,16 +1502,19 @@ generatorHYbw=function(data,bw,B,lowsup,uppsup,n=2^15,tol2=10^(-5)){
 
 
 
-#Excess of mass test
+#Excess mass test
 #(generating resamples from the KDE using the critical bw)
 
-emcbw=function(data,mod0=1,B=500,lowsup=-Inf,uppsup=Inf,n=2^15,tol=10^(-5),tol2=10^(-5)){
+emcbw=function(data,mod0=1,B=500,methodnp=1,lowsup=-Inf,uppsup=Inf,n=2^15,tol=10^(-5),tol2=10^(-5),gridsize=NULL){
   #library(ks)
   #library(diptest)
   ndata=length(data)
 
+  if(methodnp==1){approximate=FALSE}
+  if(methodnp==2){approximate=TRUE}
+
   #Test statistic
-  em=excessmass(data,mod0)
+  em=excessmass(data,mod0,approximate,gridsize)
 
   #Generating resamples
   cbw=bw.crit(data,mod0,lowsup,uppsup,n=n,tol=tol)
@@ -1252,7 +1533,7 @@ emcbw=function(data,mod0=1,B=500,lowsup=-Inf,uppsup=Inf,n=2^15,tol=10^(-5),tol2=
       samp=sample(data,length(data),replace=T)
       nuevdat=samp+eps
     }
-    emB[j]=excessmass(nuevdat,mod0)
+    emB[j]=excessmass(data,mod0,approximate,gridsize)
   }
 
 
@@ -1266,14 +1547,14 @@ emcbw=function(data,mod0=1,B=500,lowsup=-Inf,uppsup=Inf,n=2^15,tol=10^(-5),tol2=
 #############################################################
 #############################################################
 
-modetest=function(data,mod0=1,method="NP",B=500,full.result=FALSE,lowsup=-Inf,uppsup=Inf,n=NULL,tol=NULL,tol2=NULL,methodhy=NULL,alpha=NULL,nMC=NULL,BMC=NULL){
+modetest=function(data,mod0=1,method="ACR",B=500,full.result=FALSE,lowsup=-Inf,uppsup=Inf,submethod=NULL,n=NULL,tol=NULL,tol2=NULL,gridsize=NULL,alpha=NULL,nMC=NULL,BMC=NULL){
 
   if (!is.numeric(data)) stop("Argument 'data' must be numeric")
   if (sum(is.na(data))>0) warning("Missing values were removed")
   data=data[!is.na(data)]
   ndata=length(data)
   if (ndata==0) stop("No observations (at least after removing missing values)")
-  if (!any(method==c("SI","HY","FM","HH","CH","NP"))) stop("Value specified for argument 'method' is not valid")
+  if (!any(method==c("SI","HY","FM","HH","CH","ACR"))) stop("Value specified for argument 'method' is not valid")
   if (!is.numeric(B)){
     warning("Argument 'B' must be a positive integer number. Default value of 'B' was used")
     B=500
@@ -1286,7 +1567,7 @@ modetest=function(data,mod0=1,method="NP",B=500,full.result=FALSE,lowsup=-Inf,up
   if ((length(mod0)!=1)|(mod0%%1!=0) | (mod0<=0)) stop("Argument 'mod0' must be a positive integer number")
   if ((mod0!=1)&any(method==c("HY","HH","CH"))) stop("This method is only valid for testing unimodality (mod0=1)")
   if (method=="HY"&(is.infinite(lowsup)|is.infinite(uppsup))){
-    warning("Arguments 'lowsup' and 'uppsup' must be finite. Although the compact support should be imposed, a non-compact interval was used")
+    warning("Arguments 'lowsup' and 'uppsup' should be finite unless the density function has a bounded support")
   }
   if (!is.numeric(lowsup)){
     warning("Argument 'lowsup' must be numeric. Default value of 'lowsup' was used")
@@ -1332,6 +1613,46 @@ modetest=function(data,mod0=1,method="NP",B=500,full.result=FALSE,lowsup=-Inf,up
   if(full.result!=T&full.result!=F){
     warning("Argument 'full.result' must be T or F. Default value of 'full.result' was used")
     full.result=F
+  }
+
+
+  if(is.null(submethod)){
+    submethod=1
+    if((mod0>1)&(ndata>200)&(method=="ACR")){
+      submethod=2
+    }
+  }else{
+    if (!any(method==c("SI","HY","ACR"))){
+      warning("Argument 'submethod' is not needed for this method")
+    }else{
+      if ((submethod!=1) & (submethod!=2)){
+        warning("Argument 'submethod' must be equal to 1 or 2. Default value of 'submethod' was used")
+        submethod=1
+        if((mod0>1)&(ndata>200)&(method=="ACR")){
+          submethod=2
+        }
+      }
+    }
+  }
+
+
+  if(is.null(gridsize)){
+    if((method=="ACR")&(submethod==2)){
+      gridsize=c(20,20)
+    }
+  }else{
+    if (!any(method==c("ACR"))){
+      warning("Argument 'gridsize' is not needed for this method")
+    }
+    if (!is.numeric(gridsize)){
+      warning("Argument 'gridsize' must be numeric. Default values of 'gridsize' were used")
+      gridsize=c(20,20)
+    }else{
+      if(length(gridsize)!=2){
+        warning("Argument 'gridsize' must be of length two. Default value of 'gridsize' were used")
+        gridsize=c(20,20)
+      }
+    }
   }
 
   if (is.null(n)){
@@ -1380,7 +1701,7 @@ modetest=function(data,mod0=1,method="NP",B=500,full.result=FALSE,lowsup=-Inf,up
   if(is.null(tol2)){
     tol2=10^(-5)
   }else{
-    if (method!="NP"|lowsup==-Inf|uppsup==Inf){
+    if (method!="ACR"|lowsup==-Inf|uppsup==Inf){
       warning("Argument 'tol2' is not needed for this method")
     }else{
       if (!is.numeric(tol2) ){
@@ -1390,19 +1711,6 @@ modetest=function(data,mod0=1,method="NP",B=500,full.result=FALSE,lowsup=-Inf,up
       if ((tol2<=0) | (length(tol2)!=1)){
         warning("Argument 'tol2' must be a positive element. Default value of 'tol2' was used")
         tol2=10^(-5)
-      }
-    }
-  }
-
-  if(is.null(methodhy)){
-    methodhy=1
-  }else{
-    if (method!="HY"){
-      warning("Argument 'methodhy' is not needed for this method")
-    }else{
-      if ((methodhy!=1) & (methodhy!=2)){
-        warning("Argument 'methodhy' must be equal to 1 or 2. Default value of 'methodhy' was used")
-        methodhy=1
       }
     }
   }
@@ -1427,7 +1735,7 @@ modetest=function(data,mod0=1,method="NP",B=500,full.result=FALSE,lowsup=-Inf,up
   if(is.null(nMC)){
     nMC=100
   }else{
-    if ((method!="HY")|(methodhy==1)){
+    if ((method!="HY")|(submethod==1)){
       warning("Argument 'nMC' is not needed for this method")
     }else{
       if (!is.numeric(nMC)){
@@ -1444,7 +1752,7 @@ modetest=function(data,mod0=1,method="NP",B=500,full.result=FALSE,lowsup=-Inf,up
   if(is.null(BMC)){
     BMC=100
   }else{
-    if ((method!="HY")|(methodhy==1)){
+    if ((method!="HY")|(submethod==1)){
       warning("Argument 'BMC' is not needed for this method")
     }else{
       if (!is.numeric(BMC) ){
@@ -1458,14 +1766,14 @@ modetest=function(data,mod0=1,method="NP",B=500,full.result=FALSE,lowsup=-Inf,up
     }
   }
 
-  #In the excess of mass, if there are duplicated data a modification is made
+  #In the excess mass, if there are duplicated data a modification is made
 
-  if (any(method==c("HH","CH","NP"))){
+  if (any(method==c("HH","CH","ACR"))){
     if(sum(duplicated(data))>0){
       distance=dist(data)
       mindist=min(distance[distance>0])
       data=data+runif(ndata,-mindist/2,mindist/2)
-      warning("A modification of the data was made in order to compute the excess of mass or the dip statistic")
+      warning("A modification of the data was made in order to compute the excess mass or the dip statistic")
     }
   }
 
@@ -1481,11 +1789,11 @@ modetest=function(data,mod0=1,method="NP",B=500,full.result=FALSE,lowsup=-Inf,up
 
 
   if(method=="SI"){
-    pval=cbws(data,mod0,B,n,tol)
+    pval=cbws(data,mod0,B,submethod,n,tol)
     namemethod="Silverman (1981) critical bandwidth test"
     namestatistic="Critical bandwidth"
   }else if (method=="HY"){
-    pval=cbwhy(data,lowsup,uppsup,B,methodhy,alpha,n,tol,nMC,BMC)
+    pval=cbwhy(data,lowsup,uppsup,B,submethod,alpha,n,tol,nMC,BMC)
     namemethod="Hall and York (2001) critical bandwidth test"
     namestatistic="Critical bandwidth"
   }else if (method=="FM"){
@@ -1498,12 +1806,12 @@ modetest=function(data,mod0=1,method="NP",B=500,full.result=FALSE,lowsup=-Inf,up
     namestatistic="Dip"
   }else if (method=="CH"){
     pval=emch(data,B,n)
-    namemethod="Cheng and Hall (1998) excess of mass test"
-    namestatistic="Excess of mass"
-  }else if (method=="NP"){
-    pval=emcbw(data,mod0,B,lowsup,uppsup,n,tol,tol2)
-    namemethod="Ameijeiras et al. (2016) excess of mass test"
-    namestatistic="Excess of mass"
+    namemethod="Cheng and Hall (1998) excess mass test"
+    namestatistic="Excess mass"
+  }else if (method=="ACR"){
+    pval=emcbw(data,mod0,B,submethod,lowsup,uppsup,n,tol,tol2,gridsize)
+    namemethod="Ameijeiras-Alonso et al. (2016) excess mass test"
+    namestatistic="Excess mass"
   }
 
   message(namemethod)
@@ -1512,7 +1820,7 @@ modetest=function(data,mod0=1,method="NP",B=500,full.result=FALSE,lowsup=-Inf,up
   if(mod0==1){
     message(c("Null hypothesis: unimodality"))
   }else{
-    if(method=="NP"){
+    if(method=="ACR"){
       message(c("Null hypothesis: ",mod0," modes"))
     }else{
       message(c("Null hypothesis: at most ",mod0," modes"))

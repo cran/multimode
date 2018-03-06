@@ -15,13 +15,13 @@ Different examples and methods for testing (including different proposals descri
 Package: \tab multimode\cr
 Type: \tab Package\cr
 Version: \tab 1.0\cr
-Date: \tab 2017-10-17\cr
+Date: \tab 2018-03-06\cr
 License: \tab GPL-3\cr
 NeedsCompilation: \tab yes\cr
 LazyData: \tab yes\cr
 }
 This package incorporates the function \code{modetest} which tests if the number of modes of a sample is equal to a given number (against if it is greater).
-Functions \code{bw.crit} and \code{excessmass} provide the critical bandwidth and the excess of mass statistic, respectively.
+Functions \code{bw.crit} and \code{excessmass} provide the critical bandwidth and the excess mass statistic, respectively.
 Function \code{nmodes} computes the number of modes for a given bandwidth. Given a certain number of modes, function \code{locmodes} provides the estimation of the locations of modes and antimodes and their density value.
 Functions \code{modetree} and \code{modeforest} provide the mode tree and forest, respectively; they represent the estimated mode locations for different bandwidths. Function \code{sizer} can be used for determining where the smoothed curve is significantly increasing or decreasing. Registries with missing data are removed.
 For a complete list of functions, use \code{library(help="multimode")}.
@@ -29,6 +29,8 @@ For a complete list of functions, use \code{library(help="multimode")}.
 
 \references{
 Ameijeiras--Alonso, J., Crujeiras, R.M. and Rodríguez--Casal, A. (2016). Mode testing, critical bandwidth and excess mass, \emph{arXiv preprint: 1609.05188}.
+
+Ameijeiras--Alonso, J., Crujeiras, R.M. and Rodríguez--Casal, A. (2018). multimode: An R Package for Mode Assessment, \emph{arXiv preprint: 1803.00472}.
 
 Chaudhuri, P. and Marron, J. S. (1999). SiZer for exploration of structures in curves, \emph{ Journal of the American Statistical Association}, \bold{94}, 807--823.
 

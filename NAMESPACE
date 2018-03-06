@@ -1,4 +1,4 @@
-useDynLib(multimode, BinDist2,.registration = TRUE)
+useDynLib(multimode,.registration = TRUE)
 importFrom(rootSolve,uniroot.all)
 importFrom(ks,kcde,kdde,kde)
 importFrom(diptest,dip,dip.test)

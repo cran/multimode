@@ -18,7 +18,7 @@ modetree=function(data,bws=NULL,gridsize=NULL,cbw1=NULL,cbw2=NULL,display=TRUE,l
       gridsize=c(512,151)
     }else{
       if(length(gridsize)!=2){
-        warning("Argument 'gridsize' must be of length two. Default values of 'bws' were used")
+        warning("Argument 'gridsize' must be of length two. Default values of 'gridsize' were used")
         gridsize=c(512,151)
       }
     }
@@ -496,7 +496,7 @@ sizer=function(data,method=2,bws=NULL,gridsize=NULL,alpha=0.05,
     ESS=matrix(0,gridsize[1],gridsize[2])
     for(ibw in 1:length(range.h)){
       bw=range.h[ibw]
-      ESS[,ibw]=density(data,bw=bw,from=from,to=to,n=n)$y
+      ESS[,ibw]=density(data,bw=bw,from=from,to=to,n=gridsize[1])$y
     }
     ESS=t(t(ESS)*range.h)*nx*sqrt(2*pi)
 
@@ -732,6 +732,7 @@ modeforest=function(data,bws=NULL,gridsize=NULL,B=99,n=512,cbw1=NULL,cbw2=NULL,d
 
   range.x=seq.int(from, to, length.out = n.user)
   range.mf=seq.int(from, to, length.out = nmf)
+  range.mf2=c(range.mf[1]-diff(range.mf)[1]/2,range.mf+diff(range.mf)[1]/2)
 
   if(!is.null(bws)&(!is.null(cbw1)|!is.null(cbw2))){warning("Arguments 'cbw1' and 'cbw2' are not needed when 'bws' are given")}
 
@@ -845,7 +846,13 @@ modeforest=function(data,bws=NULL,gridsize=NULL,B=99,n=512,cbw1=NULL,cbw2=NULL,d
     if(re[length(re)]<(n-1)){posic=c(posic,re[length(re)])}
     temp=range.x[posic]
     for(k in 1:length(posic)){
-      modehat[(which(temp[k]<range.mf)[1]-1),ibw]=1+modehat[(which(temp[k]<range.mf)[1]-1),ibw]
+      if(k==1){
+        modehat[(which(temp[k]<range.mf2)[1]-1),ibw]=1+modehat[(which(temp[k]<range.mf2)[1]-1),ibw]
+      }else{
+        if(which(temp[k]<range.mf2)[1]!=which(temp[k-1]<range.mf2)[1]){
+          modehat[(which(temp[k]<range.mf2)[1]-1),ibw]=1+modehat[(which(temp[k]<range.mf2)[1]-1),ibw]
+        }
+      }
     }
   }
 
@@ -873,7 +880,13 @@ modeforest=function(data,bws=NULL,gridsize=NULL,B=99,n=512,cbw1=NULL,cbw2=NULL,d
         if(re[length(re)]<(n-1)){posic=c(posic,re[length(re)])}
         temp=range.x[posic]
         for(k in 1:length(posic)){
-          modehat[(which(temp[k]<range.mf)[1]-1),ibw]=1+modehat[(which(temp[k]<range.mf)[1]-1),ibw]
+          if(k==1){
+            modehat[(which(temp[k]<range.mf2)[1]-1),ibw]=1+modehat[(which(temp[k]<range.mf2)[1]-1),ibw]
+          }else{
+            if(which(temp[k]<range.mf2)[1]!=which(temp[k-1]<range.mf2)[1]){
+              modehat[(which(temp[k]<range.mf2)[1]-1),ibw]=1+modehat[(which(temp[k]<range.mf2)[1]-1),ibw]
+            }
+          }
         }
       }
 

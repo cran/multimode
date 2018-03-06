@@ -16,7 +16,7 @@ addplot=NULL,xlab=NULL,ylab=NULL,addLegend=NULL,posLegend=NULL)
   \item{lowsup}{ Lower limit for the random variable support in the computation of the  critical bandwidth. Default is \code{-Inf}.}
   \item{uppsup}{ Upper limit for the random variable support in the computation of the critical bandwidth. Default is \code{Inf}.}
   \item{n}{ The number of equally spaced points at which the density is to be estimated. When n > 512, it is rounded up to a power of 2 as in the \code{density} function. Default \code{n=2^15}.}
-  \item{tol}{ Accuracy requested in the computation of the critical bandwidth. Default \code{tol=10^(-5)}.}
+  \item{tol}{ Accuracy requested in the computation of the critical bandwidth. Default value \code{tol=10^(-5)}.}
   \item{display}{ Logical, if \code{TRUE} the kernel density estimation is plotted adding the estimated location of the modes and the antimodes. Default is \code{FALSE}.}
     \item{addplot}{ Logical, if \code{TRUE} the plot is added to the current one. Default if \code{display=TRUE} is \code{FALSE}.}
     \item{xlab}{ A title for the x axis. See \code{title}.}
