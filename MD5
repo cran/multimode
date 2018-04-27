@@ -1,7 +1,7 @@
-ac9dfa4434b815df2bd92e235448e723 *DESCRIPTION
+42554dae2f6cdd6472435e18bc932f2e *DESCRIPTION
 301481872529a6c8070fa4249e81fb6d *NAMESPACE
 157862dc94e207e5884b3b5740455bc6 *R/graphical_tools_lin.R
-e352e7adf41927320e85ee1a82d7dedc *R/mode_testing_lin.R
+248c8fa933d36a893e5bb25ccd62536f *R/mode_testing_lin.R
 39b40fb61558ba03a2eeef411b069788 *data/acidity.RData
 3c86b4472962d6c9118364e40705a559 *data/chondrite.RData
 aed8f149f4d14741bcecc761bc417d37 *data/chondritegg.RData
@@ -30,7 +30,7 @@ e69783065a50308d8e4a4cd5417184ac *man/geyser.Rd
 f4e90d91cd25764ee30db346ea1af329 *man/modeforest.Rd
 df41e554b4ba60a463fd0be95fdbc890 *man/modetest.Rd
 83e8bdec73456830ae6edad8d20598b5 *man/modetree.Rd
-b298b3d10fb7678491e44e769633f0fd *man/multimode-package.Rd
+2c166c1a54e2b61da8b4c36697708562 *man/multimode-package.Rd
 8b08835e338b45cffa24de1d845be45a *man/nmodes.Rd
 fc395e0fe8c795eedd280c39b030e7ca *man/sizer.Rd
 4dfca9278a240c828c6ab9cf0e9a4693 *man/stamps.Rd

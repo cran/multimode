@@ -1533,7 +1533,7 @@ emcbw=function(data,mod0=1,B=500,methodnp=1,lowsup=-Inf,uppsup=Inf,n=2^15,tol=10
       samp=sample(data,length(data),replace=T)
       nuevdat=samp+eps
     }
-    emB[j]=excessmass(data,mod0,approximate,gridsize)
+    emB[j]=excessmass(nuevdat,mod0,approximate,gridsize)
   }
 
 

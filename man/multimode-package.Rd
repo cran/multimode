@@ -14,7 +14,7 @@ Different examples and methods for testing (including different proposals descri
 \tabular{ll}{
 Package: \tab multimode\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
+Version: \tab 1.2\cr
 Date: \tab 2018-03-06\cr
 License: \tab GPL-3\cr
 NeedsCompilation: \tab yes\cr
