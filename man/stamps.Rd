@@ -17,7 +17,7 @@ data(stamps2)
 data(stampstable)
 }
 \format{
-  \code{stamps} includes the thickness (in millimeters) of the different stamps in the 1872 Hidalgo stamp issue. \code{stamps1} includes both the \code{thickness} and the overprinted \code{year}. \code{stamps2} includes both the \code{thickness} and the \code{watermark}. \code{stampstable} reproduces the original frequency table in Izenman and Sommer (1988), including the \code{thickness}, the overprinted years (\code{1872} or \code{1873-1874}) and the watermarks (\code{Papel Sellado} or \code{LA+-F}).
+  \code{stamps} includes the thickness (in millimeters) of the different stamps in the 1872 Hidalgo stamp issue. \code{stampstable} reproduces the original frequency table in Izenman and Sommer (1988), including the \code{thickness}, the overprinted years (\code{1872} or \code{1873-1874}) and the watermarks (\code{Papel Sellado} or \code{LA+-F}). \code{stamps1} includes both the \code{thickness} and the overprinted \code{year}. \code{stamps2} includes both the \code{thickness} and the \code{watermark}. Note that the stamp with a thickness equal to 0.118 and the watermark \code{"Papel Sellado"} was removed in \code{stamps2} since it does not have a corresponding year, probably this watermark is associated with the observation of \code{thickness} 0.117 or 0.119.
 }
 \details{
 This is a classic example for determining the number of modes.

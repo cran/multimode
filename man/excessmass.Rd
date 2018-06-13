@@ -7,14 +7,15 @@
    This function computes the excess mass statistic.
 }
 \usage{
-excessmass(data,mod0=1,approximate=FALSE,gridsize=NULL)
+excessmass(data,mod0=1,approximate=FALSE,gridsize=NULL,full.result=F)
 }
 \arguments{
   \item{data}{ Sample for computing the excess mass.}
   \item{mod0}{ Number of modes for which the excess mass is calculated. Default \code{mod0=1}.}
   \item{approximate}{ If this argument is TRUE then the excess mass value is approximated. Default \code{approximate=FALSE}.}
     \item{gridsize}{ When \code{approximate=TRUE}, number of endpoints at which the \eqn{C_m(\lambda)} sets are estimated (first element) and number of possible values of \eqn{\lambda} (second element). Default is \code{gridsize=c(20,20)}.}
-  }
+  \item{full.result}{ If this argument is TRUE then it returns the full result list, see below. Default \code{full.result=FALSE}.}
+}
 \details{
 With \code{excessmass}, the excess mass test statistic, introduced by Müller and Sawitzki (1991), for the integer number of modes specified in \code{mod0} is computed.
 
@@ -28,7 +29,11 @@ If there are repeated data in the sample or the distance between different pairs
 The NAs will be automatically removed.
 }
 \value{
-  Excess mass for \code{mod0} modes of the sample.
+  Depending on \code{full.result} either a number, the excess mass statistic for \code{mod0} modes, or an object of class \code{"estmod"} which is a \code{list} containing the following components:
+  \item{nmodes}{ The specified hypothesized value of the number of modes.}
+  \item{sample.size}{ The number of non-missing observations in the sample used for computing the excess mass.}
+  \item{excess.mass}{ Value of the excess mass test statistic.}
+  \item{approximate}{ A logical value indicating if the excess mass was approximated.}
 }
 \references{
 

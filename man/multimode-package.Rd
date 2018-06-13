@@ -14,8 +14,8 @@ Different examples and methods for testing (including different proposals descri
 \tabular{ll}{
 Package: \tab multimode\cr
 Type: \tab Package\cr
-Version: \tab 1.2\cr
-Date: \tab 2018-03-06\cr
+Version: \tab 1.3\cr
+Date: \tab 2018-06-08\cr
 License: \tab GPL-3\cr
 NeedsCompilation: \tab yes\cr
 LazyData: \tab yes\cr

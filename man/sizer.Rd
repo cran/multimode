@@ -8,8 +8,7 @@
 }
 \usage{
 sizer(data,method=2,bws=NULL,gridsize=NULL,alpha=0.05,B=NULL,n0=NULL,
-cbw1=NULL,cbw2=NULL,display=TRUE,logbw=TRUE,from=NULL,to=NULL,col.sizer=NULL,
-xlab=NULL,ylab=NULL,addlegend=TRUE,poslegend="topright")
+cbw1=NULL,cbw2=NULL,display=TRUE,logbw=TRUE,from=NULL,to=NULL,\dots)
 }
 \arguments{
   \item{data}{ Sample in which the SiZer map is computed.}
@@ -25,16 +24,12 @@ xlab=NULL,ylab=NULL,addlegend=TRUE,poslegend="topright")
   \item{logbw}{ Logical, if \code{TRUE} the plot displays and returns the log10 bandwidths. Default \code{logbw=FALSE}.}
     \item{from}{ First plotted value of the variable. Default is below the data minimum.}
     \item{to}{ Last plotted value of the variable. Default is above the data maximum.}
-    \item{col.sizer}{ Colors employed in the SiZer map for indicating the behaviour of the smoothed curve. The first color indicates where it is significantly increasing, the second where it is not significantly different from zero, the third where it is significantly negative and the forth where the data are too sparse for meaningful inference. Default \code{col.sizer=c("red","orchid","blue","grey")}.}
-    \item{xlab}{ A title for the x axis. See \code{title}.}
-    \item{ylab}{ A title for the y axis. See \code{title}.}
-    \item{addlegend}{ Logical, if \code{TRUE} the legend is displayed. Default \code{TRUE}.}
-    \item{poslegend}{ Position where the legend should be displayed. Default \code{posLegend="topright"}.}
+    \item{\dots}{ Arguments to be passed to subsequent methods, \code{\link{plot.gtmod}} for the \code{plot} and \code{print} methods.}
 }
 
 \details{
 
-With this function the assessment of SIgnificant ZERo crossing of the derivative of the smoothed curve are computed for the sample given in \code{data}. For this calculation, a kernel density estimator with Gaussian kernel and bandwidths \code{bws} is used. At a given location (horizontal axis) and using a specified bandwidth parameter (vertical axis), the SiZer map represents where the curve is significantly increasing (blue color by default), decreasing (red by default) or not significantly different from zero (orchid, a light tone of purple, by default). Thus, for a given bandwidth, a region significantly increasing followed by a region significantly decreasing (blue-red pattern by default) indicates where there is a significant peak.
+With this function the assessment of SIgnificant ZERo crossing of the derivative of the smoothed curve are computed for the sample given in \code{data}. For this calculation, a kernel density estimator with Gaussian kernel and bandwidths \code{bws} is used. When it is plotted, at a given location (horizontal axis) and using a specified bandwidth parameter (vertical axis), the SiZer map represents where the curve is significantly increasing (blue color by default), decreasing (red by default) or not significantly different from zero (orchid, a light tone of purple, by default). Thus, for a given bandwidth, a region significantly increasing followed by a region significantly decreasing (blue-red pattern by default) indicates where there is a significant peak.
 
 For methods q2, q3 and q4, it is calculated where the data are too sparse for meaningful inference (grey color by default). A location-bandwidth pixel is classified in this last category when the estimated Effective Sample Size is less than \code{n0}. For more information, see Chaudhuri and Marron (1999).
 
@@ -43,13 +38,18 @@ For methods q3 and q4, the bootstrap quantiles are computed generating \code{B} 
 The NAs will be automatically removed.
 }
 \value{
+  A list with class \code{"gtmod"} containing the following components:
   \item{sizer}{ Matrix indicating the significant behavior of the smoothed curve in each location-bandwidth pixel. One indicates significantly decreasing; two, not significantly different from zero; three, significantly increasing and four where the data are too sparse for meaningful inference.}
+  \item{method}{ A number indicating what type of quantile was performed.}
   \item{lower.CI}{ Matrix containig the lower limit of the confidence interval in each location-bandwidth pixel.}
     \item{estimate}{ Matrix containing the derivative values of the kernel density estimation in each location-bandwidth pixel.}
   \item{upper.CI}{ Matrix containig the upper limit of the confidence interval in each location-bandwidth pixel.}
   \item{ESS}{ Matrix containing the Effective Sample Size in each location-bandwidth pixel.}
-  \item{range.x}{ Employed location values to represent the mode forest.}
-  \item{range.bws}{ Employed bandwidths to compute the different mode trees.}
+  \item{range.x}{ Employed location values to represent the SiZer map.}
+  \item{range.bws}{ Employed bandwidths to compute the SiZer map.}
+    \item{logbw}{ Logical value indicating if the bandwidths are given in the log10 scale.}
+  \item{sample.size}{ The number of non-missing observations in the sample used for obtaining the SiZer map.}
+  \item{call}{ The unevaluated expression, which consists of the named function applied to the given arguments.}
 }
 \references{
 

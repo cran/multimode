@@ -1,4 +1,4 @@
-modetree=function(data,bws=NULL,gridsize=NULL,cbw1=NULL,cbw2=NULL,display=TRUE,logbw=FALSE,addplot=FALSE,xlab=NULL,ylab=NULL,col.lines="black"){
+modetree=function(data,bws=NULL,gridsize=NULL,cbw1=NULL,cbw2=NULL,display=TRUE,logbw=FALSE,...){
 
   if (!is.numeric(data)) stop("Argument 'data' must be numeric")
   if (sum(is.na(data))>0) warning("Missing values were removed")
@@ -115,25 +115,6 @@ modetree=function(data,bws=NULL,gridsize=NULL,cbw1=NULL,cbw2=NULL,display=TRUE,l
     logbw=F
   }
 
-  if(addplot!=T&addplot!=F){
-    warning("Argument 'addplot' must be T or F. Default value of 'addplot' was used")
-    addplot=F
-  }
-
-  if((!is.null(xlab)|!is.null(ylab))&addplot==T){warning("Arguments 'xlab' and 'ylab' are not needed when 'addplot' is TRUE")}
-  if(is.null(xlab)){xlab=paste(" Mode tree ","N = ",ndata)}
-  if(is.null(ylab)&logbw==FALSE){ylab="bandwidths"}
-  if(is.null(ylab)&logbw==TRUE){ylab=expression(log[10] * "(bandwidths)")}
-
-  if(length(col.lines)!=1&length(col.lines)!=2){
-    warning("Argument 'col.lines' must be of length one or two. Default values of 'col.lines' were used")
-    col.lines="black"
-  }
-
-  if(length(col.lines)==1){
-    col.lines=rep(col.lines,2)
-  }
-
   range.h=sort(range.h,decreasing=T)
   maxmodes=nmodes(data,range.h[length(range.h)],n=n)
 
@@ -159,9 +140,6 @@ modetree=function(data,bws=NULL,gridsize=NULL,cbw1=NULL,cbw2=NULL,display=TRUE,l
     hmax=log10(hmax)
   }
 
-  if(addplot==F){
-    plot(NA,ylim=c(hmin,hmax),xlim=range.data,xlab=xlab,ylab=ylab)
-  }
   matmodes2=matmodes
   linemt2=matrix(NA,nrow=length(range.h),ncol=maxmodes)
   l2=1
@@ -175,7 +153,7 @@ modetree=function(data,bws=NULL,gridsize=NULL,cbw1=NULL,cbw2=NULL,display=TRUE,l
         matmodes2[l2,which(matmodes2[l2,]==modetemp)]=NA
         if(l>1){
           lh=which.min(abs(modetemp-linemt2[l2,]))
-          lines(c(modetemp,linemt2[l2,lh]),rep(range.h[l2],2),lty=2,col=col.lines[2])
+          #lines(c(modetemp,linemt2[l2,lh]),rep(range.h[l2],2),lty=2,col=col.lines[2])
         }
         controlmt=1
       }else{
@@ -190,24 +168,159 @@ modetree=function(data,bws=NULL,gridsize=NULL,cbw1=NULL,cbw2=NULL,display=TRUE,l
         matmodes2[l3,whichlmt]=NA
       }
     }
-    lines(linemt,range.h[l2:length(range.h)],lwd=2,col=col.lines[1])
+    #lines(linemt,range.h[l2:length(range.h)],lwd=2,col=col.lines[1])
     linemt2[l2:length(range.h),l]=linemt
   }
 
   row.names(linemt2)=formatC(range.h)
   colnames(linemt2)=paste("Mode",1:maxmodes)
-  modetreeret=list(linemt2,range.h)
-  names(modetreeret)=c("locations","bandwidths")
-  invisible(modetreeret)
+  callname=match.call()
+  modetreeret=list(linemt2,range.data,range.h,logbw,ndata,callname)
+  names(modetreeret)=c("locations","range.x","range.bws","logbw","sample.size","call")
+  class(modetreeret)="gtmod"
+  if(display==T){plot(modetreeret,...)}
+  return(modetreeret)
 }
+
+
+
+###############################################################
+###############################################################
+
+
+print.gtmod<-function(x, digits = getOption("digits"),...){
+  stopifnot(is.numeric(sample.size <- x$sample.size),is.numeric(range.x <- x$range.x),is.numeric(range.bws <- x$range.bws),is.logical(logbw<-x$logbw),is.call(callname<-x$call))
+  cat("\nCall:\n\t", deparse(callname))
+  cat("\n\nn=",sample.size,". Location values range: ",sep="")
+  cat(formatC(range(range.x), digits=digits,...))
+  cat("\nNumber of employed bandwidths: ",length(x$range.bws),". log10 bandwidths scale: ",logbw,sep="")
+  cat("\nBandwidths range:",formatC(range(range.bws), digits=digits,...))
+  cat("\n\n")
+}
+
+
+
+###############################################################
+###############################################################
+
+plot.gtmod<-function(x,addplot=FALSE,xlab=NULL,ylab=NULL,col.lines="black",col.sizer=NULL,addlegend=TRUE,poslegend="topright",...){
+
+  stopifnot(is.numeric(ndata <- x$sample.size),is.numeric(range.x <- x$range.x),is.numeric(range.bws <- x$range.bws),is.logical(logbw<-x$logbw))
+
+  if(addplot!=T&addplot!=F){
+    warning("Argument 'addplot' must be T or F. Default value of 'addplot' was used")
+    addplot=F
+  }
+
+  if((!is.null(xlab)|!is.null(ylab))&addplot==T){warning("Arguments 'xlab' and 'ylab' are not needed when 'addplot' is TRUE")}
+  if(is.null(xlab)){xlab=paste("N =",ndata)}
+  if(is.null(ylab)&logbw==FALSE){ylab="bandwidths"}
+  if(is.null(ylab)&logbw==TRUE){ylab=expression(log[10] * "(bandwidths)")}
+
+  if(length(col.lines)!=1&length(col.lines)!=2){
+    warning("Argument 'col.lines' must be of length one or two. Default values of 'col.lines' were used")
+    col.lines="black"
+  }
+
+  if(length(col.lines)==1){
+    col.lines=rep(col.lines,2)
+  }
+
+  if(!is.null(x$locations)){
+
+    if(addplot==F){
+      plot(NA,ylim=range(range.bws),xlim=range(range.x),xlab=xlab,ylab=ylab,...)
+    }
+
+    for(j in 1:dim(x$locations)[2]){
+      lines(x$locations[,j],x$range.bws,lwd=2,col=col.lines[1])
+    }
+    if(dim(x$locations)[2]>1){
+      for(j in 2:dim(x$locations)[2]){
+        whichfirst=which(!is.na(x$locations[,j]))[1]
+        whichclose=which.min(abs(x$locations[whichfirst,j]-x$locations[whichfirst,1:(j-1)]))
+        lines(c(x$locations[whichfirst,j],x$locations[whichfirst,whichclose]),rep(x$range.bws[whichfirst],2),lty=2,col=col.lines[2])
+      }
+    }
+  }
+
+
+
+  if(!is.null(x$modeforest)){
+    pixdif=length(unique(as.double(x$modeforest)))-1
+    col2=grey((pixdif:0)/pixdif)
+    image(range.x,range.bws,x$modeforest,col=col2,xlab=xlab,ylab=ylab,...)
+
+    box()
+
+  }
+
+
+
+  if(!is.null(x$sizer)){
+
+
+    if(!is.null(col.sizer)){
+      if(length(col.sizer)!=4 & x$method>1){
+        warning("Argument 'col.sizer' must be of length four. Default values of 'col.sizer' were used")
+        col.sizer=NULL
+      }
+      if(length(col.sizer)!=3 & x$method==1){
+        if(length(col.sizer)==4){
+          warning("The locations where the data are not dense are not plotted for this method")
+        }else{
+          warning("Argument 'col.sizer' must be of length three. Default values of 'col.sizer' were used")
+          col.sizer=NULL
+        }
+      }
+    }
+
+    if(is.null(col.sizer)){
+      col.sizer=c("red","orchid","blue","grey")
+    }
+
+
+    if(addlegend!=T&addlegend!=F){
+      warning("Argument 'addlegend' must be T or F. Default value of 'addlegend' was used")
+      addlegend=T
+    }
+
+
+    col2=col.sizer[min(which(tabulate(x$sizer)>0)):max(which(tabulate(x$sizer)>0))]
+
+    image(range.x,range.bws,x$sizer,col=col2,xlab=xlab,ylab=ylab,...)
+    box()
+
+    legendnames=numeric()
+    legendnames[3]=expression("Sign. incr." * ""%up%"")
+    legendnames[1]=expression("Sign. dec." * ""%down%"")
+    legendnames[2]=expression("Not sign."!=0)
+    legendnames[4]="Sparse data"
+    elemnonzero=c(3,2,1,4)[c(3,2,1,4)%in%which(tabulate(x$sizer,4)>0)]
+
+    colleg=col.sizer[elemnonzero]
+    legendnames2=legendnames[elemnonzero]
+
+    if(addlegend==T){
+      legend(poslegend,legend = legendnames2, pch=rep(22,length(colleg)),col=rep("white",length(colleg)),pt.bg=colleg,pt.cex=1.5,pt.lwd=1.5,bty="n")
+    }
+  }
+
+
+}
+
+
+
+###############################################################
+###############################################################
+
 
 
 
 
 sizer=function(data,method=2,bws=NULL,gridsize=NULL,alpha=0.05,
                B=NULL,n0=NULL,cbw1=NULL,cbw2=NULL,display=TRUE,
-               logbw=TRUE,from=NULL,to=NULL,col.sizer=NULL,xlab=NULL,
-               ylab=NULL,addlegend=TRUE,poslegend="topright"){
+               logbw=TRUE,from=NULL,to=NULL,...){
 
   if (!is.numeric(data)) stop("Argument 'data' must be numeric")
   if (sum(is.na(data))>0) warning("Missing values were removed")
@@ -215,8 +328,6 @@ sizer=function(data,method=2,bws=NULL,gridsize=NULL,alpha=0.05,
   N=as.integer(length(data))
   nx=N
   if (nx==0) stop("No observations (at least after removing missing values)")
-
-  if(is.null(xlab)){xlab=paste("N = ",nx)}
 
   if(display!=T&display!=F){
     warning("Argument 'display' must be T or F. Default value of 'display' was used")
@@ -227,11 +338,6 @@ sizer=function(data,method=2,bws=NULL,gridsize=NULL,alpha=0.05,
     warning("Argument 'logbw' must be T or F. Default value of 'logbw' was used")
     logbw=T
   }
-
-  if((!is.null(xlab)|!is.null(ylab)|!is.null(col.sizer))&display==F){warning("Arguments 'col.sizer', 'xlab' and 'ylab' are not needed when 'display' is FALSE")}
-
-  if(is.null(ylab)&logbw==F){ylab="bandwidths"}
-  if(is.null(ylab)&logbw==T){ylab=expression(log[10] * "(bandwidths)")}
 
 
   if(is.null(gridsize)){
@@ -409,31 +515,6 @@ sizer=function(data,method=2,bws=NULL,gridsize=NULL,alpha=0.05,
   }
 
 
-  if(!is.null(col.sizer)){
-    if(length(col.sizer)!=4 & method>1){
-      warning("Argument 'col.sizer' must be of length four. Default values of 'col.sizer' were used")
-      col.sizer=NULL
-    }
-    if(length(col.sizer)!=3 & method==1){
-      if(length(col.sizer)==4){
-        warning("The locations where the data are not dense are not plotted for this method")
-      }else{
-        warning("Argument 'col.sizer' must be of length three. Default values of 'col.sizer' were used")
-        col.sizer=NULL
-      }
-    }
-  }
-
-  if(is.null(col.sizer)){
-    col.sizer=c("red","orchid","blue","grey")
-  }
-
-
-  if(addlegend!=T&addlegend!=F){
-    warning("Argument 'addlegend' must be T or F. Default value of 'addlegend' was used")
-    logbw=T
-  }
-
 
 
 
@@ -577,50 +658,20 @@ sizer=function(data,method=2,bws=NULL,gridsize=NULL,alpha=0.05,
 
   matrixSiZer=(matrixSiZer/2)+2
 
-  col2=col.sizer[min(which(tabulate(matrixSiZer)>0)):max(which(tabulate(matrixSiZer)>0))]
-
-  if(display==T){
-
-  if(logbw==T){
-    image(range.x,log10(range.h),matrixSiZer,col=col2,xlab=xlab,ylab=ylab)
-  }else{
-    image(range.x,range.h,matrixSiZer,col=col2,xlab=xlab,ylab=ylab)
-  }
-
-  box()
-
-  legendnames=numeric()
-  legendnames[3]=expression("Sign. incr." * ""%up%"")
-  legendnames[1]=expression("Sign. dec." * ""%down%"")
-  legendnames[2]=expression("Not sign."!=0)
-  legendnames[4]="Sparse data"
-  elemnonzero=c(3,2,1,4)[c(3,2,1,4)%in%which(tabulate(matrixSiZer,4)>0)]
-
-  colleg=col.sizer[elemnonzero]
-  legendnames2=legendnames[elemnonzero]
-
-  if(addlegend==T){
-    legend(poslegend,legend = legendnames2, pch=rep(22,length(colleg)),col=rep("white",length(colleg)),pt.bg=colleg,pt.cex=1.5,pt.lwd=1.5,bty="n")
-  }
-  }
 
   if(method==1){
     ESS="ESS is not computed for this method"
   }
 
   if(logbw==T){
-    colnames(matrixSiZer)=formatC(log10(range.h))
-    colnames(downquan)=formatC(log10(range.h))
-    colnames(fhatp)=formatC(log10(range.h))
-    colnames(upquan)=formatC(log10(range.h))
-    if(method>1){colnames(ESS)=formatC(log10(range.h))}
-  }else{
-    colnames(matrixSiZer)=formatC(range.h)
-    colnames(downquan)=formatC(range.h)
-    colnames(fhatp)=formatC(range.h)
-    colnames(upquan)=formatC(range.h)
-    if(method>1){colnames(ESS)=formatC(range.h)}
+    range.h=log10(range.h)
   }
+
+  colnames(matrixSiZer)=formatC(range.h)
+  colnames(downquan)=formatC(range.h)
+  colnames(fhatp)=formatC(range.h)
+  colnames(upquan)=formatC(range.h)
+  if(method>1){colnames(ESS)=formatC(range.h)}
 
   rownames(matrixSiZer)=formatC(range.x)
   rownames(downquan)=formatC(range.x)
@@ -628,9 +679,13 @@ sizer=function(data,method=2,bws=NULL,gridsize=NULL,alpha=0.05,
   rownames(upquan)=formatC(range.x)
   if(method>1){rownames(ESS)=formatC(range.x)}
 
-  sizerret=list(matrixSiZer,downquan,fhatp,upquan,ESS,range.x,range.h)
-  names(sizerret)=c("sizer","lower.CI","estimate","upper.CI","ESS","range.x","range.bws")
-  invisible(sizerret)
+  callname=match.call()
+  sizerret=list(matrixSiZer,method,downquan,fhatp,upquan,ESS,range.x,range.h,logbw,nx,callname)
+  names(sizerret)=c("sizer","method","lower.CI","estimate","upper.CI","ESS","range.x","range.bws","logbw","sample.size","call")
+
+  class(sizerret)="gtmod"
+  if(display==T){plot(sizerret,...)}
+  return(sizerret)
 
 }
 
@@ -640,7 +695,7 @@ sizer=function(data,method=2,bws=NULL,gridsize=NULL,alpha=0.05,
 
 
 
-modeforest=function(data,bws=NULL,gridsize=NULL,B=99,n=512,cbw1=NULL,cbw2=NULL,display=TRUE,logbw=FALSE,from=NULL,to=NULL,xlab=NULL,ylab=NULL){
+modeforest=function(data,bws=NULL,gridsize=NULL,B=99,n=512,cbw1=NULL,cbw2=NULL,display=TRUE,logbw=FALSE,from=NULL,to=NULL,...){
 
   if (!is.numeric(data)) stop("Argument 'data' must be numeric")
   if (sum(is.na(data))>0) warning("Missing values were removed")
@@ -648,8 +703,6 @@ modeforest=function(data,bws=NULL,gridsize=NULL,B=99,n=512,cbw1=NULL,cbw2=NULL,d
   N=as.integer(length(data))
   nx=N
   if (nx==0) stop("No observations (at least after removing missing values)")
-
-  if(is.null(xlab)){xlab=paste("N = ",nx)}
 
   if(display!=T&display!=F){
     warning("Argument 'display' must be T or F. Default value of 'display' was used")
@@ -660,12 +713,6 @@ modeforest=function(data,bws=NULL,gridsize=NULL,B=99,n=512,cbw1=NULL,cbw2=NULL,d
     warning("Argument 'logbw' must be T or F. Default value of 'logbw' was used")
     logbw=T
   }
-
-  if((!is.null(xlab)|!is.null(ylab))&display==F){warning("Arguments 'xlab' and 'ylab' are not needed when 'display' is FALSE")}
-
-  if(is.null(ylab)&logbw==F){ylab="bandwidths"}
-  if(is.null(ylab)&logbw==T){ylab=expression(log[10] * "(bandwidths)")}
-
 
   if(is.null(gridsize)){
     gridsize=c(100,151)
@@ -892,30 +939,25 @@ modeforest=function(data,bws=NULL,gridsize=NULL,B=99,n=512,cbw1=NULL,cbw2=NULL,d
 
     }
 
-  col2=grey((max(modehat):0)/max(modehat))
+
 
   modehat=modehat/(B+1)
 
-  if(display==T){
 
-    if(logbw==T){
-      image(range.mf,log10(range.h),modehat,col=col2,xlab=xlab,ylab=ylab)
-    }else{
-      image(range.mf,range.h,modehat,col=col2,xlab=xlab,ylab=ylab)
-    }
-    box()
-
-  }
 
   if(logbw==T){
-    colnames(modehat)=formatC(log10(range.h))
-  }else{
-    colnames(modehat)=formatC(range.h)
+    range.h=log10(range.h)
   }
+  colnames(modehat)=formatC(range.h)
   row.names(modehat)=formatC(range.mf)
-  modehatret=list(modehat,range.mf,range.h)
-  names(modehatret)=c("modeforest","range.x","range.bws")
-  invisible(modehatret)
+  callname=match.call()
+  modehatret=list(modehat,range.mf,range.h,logbw,nx,callname)
+  names(modehatret)=c("modeforest","range.x","range.bws","logbw","sample.size","call")
+  class(modehatret)="gtmod"
+  if(display==T){plot(modehatret,...)}
+  return(modehatret)
+
+
 
 }
 

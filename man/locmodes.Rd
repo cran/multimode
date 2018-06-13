@@ -1,14 +1,19 @@
 \encoding{utf8}
 \name{locmodes}
 \alias{locmodes}
+\alias{plot.locmod}
+\alias{print.locmod}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ Location of modes and antimodes }
 \description{
    Given a certain number of modes, this function provides the estimation of the location of modes and antimodes and their density value.
 }
 \usage{
-locmodes(data,mod0=1,lowsup=-Inf,uppsup=Inf,n=2^15,tol=10^(-5),display=F,
-addplot=NULL,xlab=NULL,ylab=NULL,addLegend=NULL,posLegend=NULL)
+locmodes(data,mod0=1,lowsup=-Inf,uppsup=Inf,n=2^15,tol=10^(-5),display=F,\dots)
+
+\method{plot}{locmod}(x,addplot=NULL,xlab=NULL,ylab=NULL,addLegend=NULL,posLegend=NULL,\dots)
+
+\method{print}{locmod}(x,digits=getOption("digits"), \dots)
 }
 \arguments{
   \item{data}{ Sample in which the critical bandwidth is computed.}
@@ -18,11 +23,14 @@ addplot=NULL,xlab=NULL,ylab=NULL,addLegend=NULL,posLegend=NULL)
   \item{n}{ The number of equally spaced points at which the density is to be estimated. When n > 512, it is rounded up to a power of 2 as in the \code{density} function. Default \code{n=2^15}.}
   \item{tol}{ Accuracy requested in the computation of the critical bandwidth. Default value \code{tol=10^(-5)}.}
   \item{display}{ Logical, if \code{TRUE} the kernel density estimation is plotted adding the estimated location of the modes and the antimodes. Default is \code{FALSE}.}
-    \item{addplot}{ Logical, if \code{TRUE} the plot is added to the current one. Default if \code{display=TRUE} is \code{FALSE}.}
+    \item{\dots}{ Arguments to be passed to subsequent methods, \code{\link[graphics]{plot.default}} for the \code{plot} method and \code{\link[base]{formatC}} for the \code{print} method.}
+    \item{x}{ An object inheriting from class \code{"locmod"}.}
+    \item{addplot}{ Logical, if \code{TRUE} the plot is added to the current one. Default is \code{FALSE}.}
     \item{xlab}{ A title for the x axis. See \code{title}.}
     \item{ylab}{ A title for the y axis. See \code{title}.}
-  \item{addLegend}{ Logical, if \code{TRUE} the legend is added in the plot. Default if \code{display=TRUE} is \code{TRUE}.}
-  \item{posLegend}{ The vector of two elements of coordinates to be used to position the legend. It can be specified by keyword as in the function \code{legend}. Default if \code{display=TRUE} is \code{"topright"}.}
+  \item{addLegend}{ Logical, if \code{TRUE} the legend is added in the plot. Default is \code{TRUE}.}
+  \item{posLegend}{ The vector of two elements of coordinates to be used to position the legend. It can be specified by keyword as in the function \code{legend}. Default is \code{"topright"}.}
+    \item{digits}{ Number of significant digits to use, see \code{\link[base]{formatC}}.}
 }
 
 \details{
@@ -36,9 +44,10 @@ If \code{display=TRUE}, then the kernel density estimation using the critical ba
 The NAs will be automatically removed.
 }
 \value{
+  A list with class \code{"locmod"} containing the following components:
   \item{locations}{ Vector with the estimated locations of modes (odd positions of the vector) and antimodes (even positions). }
   \item{fvalue}{ Vector with estimated density values at modes (odd positions of the vector) and antimodes (even positions).}
-  \item{cbw}{ Critical bandwidth of the sample for \code{mod0} modes.}
+  \item{cbw}{ A list with class \code{"estmod"} which contains the critical bandwidth of the sample for \code{mod0} modes, see \code{\link{bw.crit}}.}
 }
 \references{
 

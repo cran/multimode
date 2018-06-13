@@ -1,6 +1,6 @@
 #A function computing the KDE number of modes
 
-nmodes=function(data,bw,lowsup=-Inf,uppsup=Inf,n=2^15){
+nmodes=function(data,bw,lowsup=-Inf,uppsup=Inf,n=2^15,full.result=F){
 
 
   if (!is.numeric(data)) stop("Argument 'data' must be numeric")
@@ -73,7 +73,11 @@ nmodes=function(data,bw,lowsup=-Inf,uppsup=Inf,n=2^15){
 
   #Number of modes
   num=length(posic)
-
+  if(full.result==T){
+    num<-list(num,ndata,bw,lowsup,uppsup,fn$x,fn$y)
+    names(num)<-c("nmodes","sample.size","bw","lowsup","uppsup","fnx","fny")
+    class(num)<-"estmod"
+  }
   return(num)
 }
 
@@ -86,7 +90,7 @@ nmodes=function(data,bw,lowsup=-Inf,uppsup=Inf,n=2^15){
 
 #Critical bandwidth (Silverman by default)
 
-bw.crit=function(data,mod0=1,lowsup=-Inf,uppsup=Inf,n=2^15,tol=10^(-5)){
+bw.crit=function(data,mod0=1,lowsup=-Inf,uppsup=Inf,n=2^15,tol=10^(-5),full.result=F){
 
 
 
@@ -196,6 +200,12 @@ bw.crit=function(data,mod0=1,lowsup=-Inf,uppsup=Inf,n=2^15,tol=10^(-5)){
       controli=1
     }
   }
+  if(full.result==T){
+    fn=density(data,bw=cbw,n=n)
+    cbw<-list(mod0,ndata,cbw,lowsup,uppsup,fn$x,fn$y)
+    names(cbw)<-c("nmodes","sample.size","bw","lowsup","uppsup","fnx","fny")
+    class(cbw)<-"estmod"
+  }
   return(cbw)
 }
 
@@ -203,6 +213,34 @@ bw.crit=function(data,mod0=1,lowsup=-Inf,uppsup=Inf,n=2^15,tol=10^(-5)){
 ###############################################################
 ###############################################################
 
+
+print.estmod<-function(x, digits = getOption("digits"),...){
+
+  stopifnot(is.numeric(sample.size <- x$sample.size),is.numeric(nmodes <- x$nmodes))
+
+  cat("\nn= ",sample.size,". Number of modes: ",nmodes,sep="")
+
+  if(!is.null(x$bw)){
+    bw<-x$bw
+    lowsup<-x$lowsup
+    uppsup<-x$uppsup
+    cat("\nBandwidth:", formatC(bw, digits=digits,...))
+    cat("\nSupport where the number of modes are computed\n", formatC(lowsup, digits=digits,...), formatC(uppsup, digits=digits,...))
+    cat("\n")
+  }
+  if(!is.null(x$excess.mass)){
+    excess.mass<-x$excess.mass
+    approximate<-x$approximate
+    if(approximate==T){cat("\nApproximated excess mass:")}
+    if(approximate==F){cat("\nExcess mass:")}
+    cat(formatC(excess.mass, digits=digits,...))
+    cat("\n")
+  }
+}
+
+
+###############################################################
+###############################################################
 
 
 #Critical bandwidth test (Silverman, 1981)
@@ -244,7 +282,6 @@ cbws=function(data,mod0=1,B=500,methodsi=1,n=2^10,tol=10^(-5)){
 
 ###############################################################
 ###############################################################
-
 
 
 
@@ -844,7 +881,7 @@ excessmassapp=function(data,mod0=2,gridsize=c(20,20)){
 
 #Excess mass statistic
 
-excessmass=function(data,mod0=1,approximate=FALSE,gridsize=NULL){
+excessmass=function(data,mod0=1,approximate=FALSE,gridsize=NULL,full.result=F){
 
   if (!is.numeric(data)) stop("Argument 'data' must be numeric")
   if (sum(is.na(data))>0) warning("Missing values were removed")
@@ -879,11 +916,18 @@ excessmass=function(data,mod0=1,approximate=FALSE,gridsize=NULL){
   }
 
   if(approximate==T){
-    return(excessmassapp(data,mod0,gridsize))
+    excmassval<-excessmassapp(data,mod0,gridsize)
   }else{
-    return(excessmassex(data,mod0))
+    excmassval<-excessmassex(data,mod0)
   }
 
+  if(full.result==T){
+    excmassval<-list(mod0,ndata,excmassval,approximate)
+    names(excmassval)<-c("nmodes","sample.size","excess.mass","approximate")
+    class(excmassval)<-"estmod"
+  }
+
+  return(excmassval)
 
 }
 
@@ -961,7 +1005,7 @@ emch=function(data,B=500,n=2^15){
 
 
 
-locmodes=function(data,mod0=1,lowsup=-Inf,uppsup=Inf,n=2^15,tol=10^(-5),display=F,addplot=NULL,xlab=NULL,ylab=NULL,addLegend=NULL,posLegend=NULL){
+locmodes=function(data,mod0=1,lowsup=-Inf,uppsup=Inf,n=2^15,tol=10^(-5),display=F,...){
 
   if (!is.numeric(data)) stop("Argument 'data' must be numeric")
   if (sum(is.na(data))>0) warning("Missing values were removed")
@@ -1040,54 +1084,9 @@ locmodes=function(data,mod0=1,lowsup=-Inf,uppsup=Inf,n=2^15,tol=10^(-5),display=
     display=F
   }
 
-  if(is.null(addplot)){
-    addplot=F
-  }else{
-    if(addplot!=T&addplot!=F){
-      warning("Argument 'addplot' must be T or F. Default value of 'addplot' was used")
-      addplot=F
-    }else{
-      if(display==F){
-        warning("Argument 'addplot' is not needed when 'display' is FALSE")
-      }
-    }
-  }
+  cbw=bw.crit(data,mod0,lowsup,uppsup,n,tol,full.result=T)
 
-  if(is.null(addLegend)){
-    addLegend=T
-  }else{
-    if(addLegend!=T&addLegend!=F){
-      warning("Argument 'addLegend' must be T or F. Default value of 'addLegend' was used")
-      addLegend=T
-    }else{
-      if(display==F){
-        warning("Argument 'addLegend' is not needed when 'display' is FALSE")
-      }
-    }
-  }
-
-  if(is.null(posLegend)){
-    posLegend="topright"
-  }else{
-    if(display==F){
-      warning("Argument 'posLegend' is not needed when 'display' is FALSE")
-    }else{
-      possleg= c("bottomright", "bottom", "bottomleft","left", "topleft", "top", "topright", "right", "center")
-      if(!is.numeric(posLegend)&!any(posLegend==possleg)){
-        warning(paste0("Argument 'posLegend' must be a valid coordinates or one of '",paste(possleg,collapse="','"),"'. Default value of 'posLegend' was used"),sep="")
-        posLegend="topright"
-      }
-      if(is.numeric(posLegend)&(length(posLegend)!=2)){
-        warning(paste0("Argument 'posLegend' must be a valid coordinates or one of '",paste(possleg,collapse="','"),"'. Default value of 'posLegend' was used"),sep="")
-        posLegend="topright"
-      }
-
-    }
-  }
-
-  cbw=bw.crit(data,mod0,lowsup,uppsup,n,tol)
-
-  fn=density(data,bw=cbw,n=n)
+  fn=density(data,bw=cbw$bw,n=n)
 
 
   #Posiciones en las que están los máximos
@@ -1133,16 +1132,125 @@ locmodes=function(data,mod0=1,lowsup=-Inf,uppsup=Inf,n=2^15,tol=10^(-5),display=
     }
   }
 
+  loctod=list(localizations,flocalizations,cbw)
+  names(loctod)=c("locations","fvalue","cbw")
+  class(loctod) <- "locmod"
+  if(display==T){plot(loctod,...)}
+  return(loctod)
+}
+
+
+
+###############################################################
+###############################################################
+
+print.locmod<-function(x, digits = getOption("digits"),...){
+  stopifnot(is.numeric(localizations <- x$locations),is.numeric(flocalizations <- x$fvalue))
+  cbw <- x$cbw
+  mod0<-cbw$nmodes
+  localization<-localizations[seq(1,length(localizations),by=2)]
+  flocalization<-flocalizations[seq(1,length(localizations),by=2)]
+  cat("\nEstimated location\n")
+  if(mod0>1){
+    localizationm<-localizations[seq(2,length(localizations),by=2)]
+    flocalizationm<-flocalizations[seq(2,length(localizations),by=2)]
+    cat("Modes:",paste(formatC(localization, digits=digits,...),""))
+    if(mod0>2){
+      cat("\nAntimodes:",paste(formatC(localizationm, digits=digits,...),""))
+    }else{
+      cat("\nAntimode:",paste(formatC(localizationm, digits=digits,...),""))
+    }
+  }else{
+    cat("Mode:",paste(formatC(localization, digits=digits,...),""))
+  }
+  cat("")
+  cat("\n\nEstimated value of the density\n")
+  if(mod0>1){
+    cat("Modes:",paste(formatC(flocalization, digits=digits,...),""))
+    if(mod0>2){
+      cat("\nAntimodes:",paste(formatC(flocalizationm, digits=digits,...),""))
+    }else{
+      cat("\nAntimode:",paste(formatC(flocalizationm, digits=digits,...),""))
+    }
+  }else{
+    cat("Mode:",paste(formatC(flocalization, digits=digits,...),""))
+  }
+  cat("")
+  cat("\n\nCritical bandwidth:", formatC(cbw$bw, digits=digits,...))
+  cat("\n\n")
+  invisible(x)
+}
+
+
+###############################################################
+###############################################################
+
+plot.locmod<-function(x,addplot=NULL,xlab=NULL,ylab=NULL,addLegend=NULL,posLegend=NULL,...){
+
+  stopifnot(is.numeric(localizations <- x$locations),is.numeric(flocalizations <- x$fvalue))
+
+  cbw <- x$cbw
+  mod0<-cbw$nmodes
+  fnx<-cbw$fnx
+  fny<-cbw$fny
+  lowsup<-cbw$lowsup
+  uppsup<-cbw$uppsup
+  ndata<-cbw$sample.size
+  cbw <- cbw$bw
+
+  localization<-localizations[seq(1,length(localizations),by=2)]
+  flocalization<-flocalizations[seq(1,length(localizations),by=2)]
+
+  localizationm<-numeric()
+  flocalizationm<-numeric()
+
+  if(mod0>1){
+    localizationm<-localizations[seq(2,length(localizations),by=2)]
+    flocalizationm<-flocalizations[seq(2,length(localizations),by=2)]
+  }
+
+  if(is.null(addplot)){
+    addplot=F
+  }else{
+    if(addplot!=T&addplot!=F){
+      warning("Argument 'addplot' must be T or F. Default value of 'addplot' was used")
+      addplot=F
+    }
+  }
+
+  if(is.null(addLegend)){
+    addLegend=T
+  }else{
+    if(addLegend!=T&addLegend!=F){
+      warning("Argument 'addLegend' must be T or F. Default value of 'addLegend' was used")
+      addLegend=T
+    }
+  }
+
+  if(is.null(posLegend)){
+    posLegend="topright"
+  }else{
+    possleg= c("bottomright", "bottom", "bottomleft","left", "topleft", "top", "topright", "right", "center")
+    if(!is.numeric(posLegend)&!any(posLegend==possleg)){
+      warning(paste0("Argument 'posLegend' must be a valid coordinates or one of '",paste(possleg,collapse="','"),"'. Default value of 'posLegend' was used"),sep="")
+        posLegend="topright"
+      }
+      if(is.numeric(posLegend)&(length(posLegend)!=2)){
+        warning(paste0("Argument 'posLegend' must be a valid coordinates or one of '",paste(possleg,collapse="','"),"'. Default value of 'posLegend' was used"),sep="")
+        posLegend="topright"
+      }
+  }
+
+
   if((!is.null(xlab)|!is.null(ylab))&addplot==T){warning("Arguments 'xlab' and 'ylab' are not needed when 'addplot' is TRUE")}
 
-  if(is.null(xlab)){xlab=paste("N = ",ndata," Critical bandwidth = ",formatC(cbw))}
+  if(is.null(xlab)){xlab=paste("N = ",ndata," Critical bandwidth = ",formatC(cbw,...))}
   if(is.null(ylab)){ylab="Density"}
 
-  if(display==T){
     if(addplot==F){
-        plot(NA,xlim=c(min(fn$x),max(fn$x)),ylim=c(min(fn$y),max(fn$y)),main="",ylab=ylab,xlab=xlab)
+      plot(NA,xlim=c(min(fnx),max(fnx)),ylim=c(min(fny),max(fny)),ylab=ylab,xlab=xlab,...)
     }
-    lines(fn)
+    lines(fnx,fny,...)
     for(i in 1:mod0){
       lines(c(localization[i],localization[i]),c(-1,flocalization[i]),lty=2,lwd=2)
     }
@@ -1151,18 +1259,18 @@ locmodes=function(data,mod0=1,lowsup=-Inf,uppsup=Inf,n=2^15,tol=10^(-5),display=
         lines(c(localizationm[i],localizationm[i]),c(-1,flocalizationm[i]),lty=3,lwd=2)
       }
     }
-    lines(c(lowsup,lowsup),c(-1,2*max(fn$y)),lwd=2)
-    lines(c(uppsup,uppsup),c(-1,2*max(fn$y)),lwd=2)
+    lines(c(lowsup,lowsup),c(-1,2*max(fny)),lwd=2)
+    lines(c(uppsup,uppsup),c(-1,2*max(fny)),lwd=2)
     if(addLegend==T){
       if((mod0==1)&(length(localizationm)==0)){
-        if((lowsup>min(fn$x))|(uppsup<max(fn$x))){
+        if((lowsup>min(fnx))|(uppsup<max(fnx))){
           legend(posLegend,legend = c("Mode","Support"), lty = c(2,1),lwd= c(2,2))
         }else{
           legend(posLegend,legend = c("Mode"), lty = c(2),lwd= c(2))
         }
       }
       if((mod0==1)&(length(localizationm)>0)){
-        if((lowsup>min(fn$x))|(uppsup<max(fn$x))){
+        if((lowsup>min(fnx))|(uppsup<max(fnx))){
           if(length(localizationm)==1){
             legendnames=c("Mode","Antimode","Support")
           }else{
@@ -1179,7 +1287,7 @@ locmodes=function(data,mod0=1,lowsup=-Inf,uppsup=Inf,n=2^15,tol=10^(-5),display=
         }
       }
       if(mod0>1){
-        if((lowsup>min(fn$x))|(uppsup<max(fn$x))){
+        if((lowsup>min(fnx))|(uppsup<max(fnx))){
           if(length(localizationm)==1){
             legendnames=c("Modes","Antimode","Support")
           }else{
@@ -1196,41 +1304,9 @@ locmodes=function(data,mod0=1,lowsup=-Inf,uppsup=Inf,n=2^15,tol=10^(-5),display=
         }
       }
     }
-  }
 
-  loctod=list(localizations,flocalizations,cbw)
-  names(loctod)=c("locations","fvalue","cbw")
-  message("Estimated location")
-  if(mod0>1){
-    message("Modes: ",paste(formatC(localization),""))
-    if(mod0>2){
-      message("Antimodes: ",paste(formatC(localizationm),""))
-    }else{
-      message("Antimode: ",paste(formatC(localizationm),""))
-    }
-  }else{
-    message("Mode: ",paste(formatC(localization),""))
-  }
-  message("")
-  message("Estimated value of the density")
-  if(mod0>1){
-    message("Modes: ",paste(formatC(flocalization),""))
-    if(mod0>2){
-      message("Antimodes: ",paste(formatC(flocalizationm),""))
-    }else{
-      message("Antimode: ",paste(formatC(flocalizationm),""))
-    }
-  }else{
-    message("Mode: ",paste(formatC(flocalization),""))
-  }
-  message("")
-  message("Critical bandwidth: ", formatC(cbw))
-  invisible(loctod)
+
 }
-
-
-
-
 
 
 ###############################################################
@@ -1547,10 +1623,12 @@ emcbw=function(data,mod0=1,B=500,methodnp=1,lowsup=-Inf,uppsup=Inf,n=2^15,tol=10
 #############################################################
 #############################################################
 
-modetest=function(data,mod0=1,method="ACR",B=500,full.result=FALSE,lowsup=-Inf,uppsup=Inf,submethod=NULL,n=NULL,tol=NULL,tol2=NULL,gridsize=NULL,alpha=NULL,nMC=NULL,BMC=NULL){
+modetest=function(data,mod0=1,method="ACR",B=500,lowsup=-Inf,uppsup=Inf,submethod=NULL,n=NULL,tol=NULL,tol2=NULL,gridsize=NULL,alpha=NULL,nMC=NULL,BMC=NULL){
 
   if (!is.numeric(data)) stop("Argument 'data' must be numeric")
-  if (sum(is.na(data))>0) warning("Missing values were removed")
+  dname <- deparse(substitute(data))
+  sumna<-sum(is.na(data))
+  if (sumna>0) warning("Missing values were removed")
   data=data[!is.na(data)]
   ndata=length(data)
   if (ndata==0) stop("No observations (at least after removing missing values)")
@@ -1610,10 +1688,6 @@ modetest=function(data,mod0=1,method="ACR",B=500,full.result=FALSE,lowsup=-Inf,u
     uppsup=lowsup2
   }
 
-  if(full.result!=T&full.result!=F){
-    warning("Argument 'full.result' must be T or F. Default value of 'full.result' was used")
-    full.result=F
-  }
 
 
   if(is.null(submethod)){
@@ -1814,29 +1888,14 @@ modetest=function(data,mod0=1,method="ACR",B=500,full.result=FALSE,lowsup=-Inf,u
     namestatistic="Excess mass"
   }
 
-  message(namemethod)
-  message("")
-  message(c(namestatistic," statistic: ",formatC(pval[2]),", p-value: ", formatC(pval[1])))
-  if(mod0==1){
-    message(c("Null hypothesis: unimodality"))
-  }else{
-    if(method=="ACR"){
-      message(c("Null hypothesis: ",mod0," modes"))
-    }else{
-      message(c("Null hypothesis: at most ",mod0," modes"))
-    }
-  }
-  message(c("Alternative hypothesis: at least ",mod0+1," modes"))
-  message("")
+  names(mod0) <- "number of modes"
+  alternative <- "greater"
+  #names(B) <- "bootstrap replicates"
+  statval <- pval[2]
+  names(statval) <- namestatistic
+  totval<-list(statistic =statval, p.value=pval[1],null.value=mod0,alternative=alternative,method=namemethod,sample.size=ndata,data.name=dname,bad.obs=sumna)
+  class(totval) <- "htest"
 
-  names(pval)=c("p.value","statistic")
-
-  if(full.result==T){
-    pval=as.list(pval)
-  }else{
-    pval=pval[1]
-  }
-
-  invisible(pval)
+  return(totval)
 
 }

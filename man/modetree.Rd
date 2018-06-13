@@ -8,7 +8,7 @@
 }
 \usage{
 modetree(data,bws=NULL,gridsize=NULL,cbw1=NULL,cbw2=NULL,display=TRUE,
-logbw=FALSE,addplot=FALSE,xlab=NULL,ylab=NULL,col.lines="black")
+logbw=FALSE,\dots)
 }
 \arguments{
   \item{data}{ Sample in which the mode tree is computed.}
@@ -18,21 +18,23 @@ logbw=FALSE,addplot=FALSE,xlab=NULL,ylab=NULL,col.lines="black")
   \item{cbw2}{ Number of modes for which the second critical bandwidth is calculated. This is the last bandwidth used to compute the mode tree when \code{bws} is not specified.}
   \item{display}{ Logical, if \code{TRUE} the mode tree plot is plotted. Default \code{TRUE}.}
   \item{logbw}{ Logical, if \code{TRUE} the plot displays and returns the log10 bandwidths. Default \code{logbw=FALSE}.}
-    \item{addplot}{ Logical, if \code{TRUE} the plot is added to the current one. Default is \code{FALSE}.}
-    \item{xlab}{ A title for the x axis. See \code{title}.}
-    \item{ylab}{ A title for the y axis. See \code{title}.}
-    \item{col.lines}{ Color employed in the mode tree. If the length is two, the first color is employed for representing the location of the modes and the second one for the splitting of the modes. Default is \code{col.lines="black"}.}
+  \item{\dots}{ Arguments to be passed to subsequent methods, \code{\link{plot.gtmod}} for the \code{plot} and \code{print} methods.}
 }
 
 \details{
 
-The mode tree for the sample given in \code{data} is computed. For this calculation, a kernel density estimator with Gaussian kernel and bandwidths \code{bws} is used. This plot shows with the continuous lines the estimated mode locations at each bandwidth. The horizontal dashed lines indicate the splitting of a mode in more modes.
+The mode tree for the sample given in \code{data} is computed. For this calculation, a kernel density estimator with Gaussian kernel and bandwidths \code{bws} is used. When it is plotted, it shows with the continuous lines the estimated mode locations at each bandwidth. The horizontal dashed lines indicate the splitting of a mode in more modes.
 
 The NAs will be automatically removed.
 }
 \value{
+  A list with class \code{"gtmod"} containing the following components:
   \item{locations}{ Estimated mode locations for the bandwidths given in the row names.}
-  \item{bandwidths}{ Employed bandwidths to compute the mode tree.}
+  \item{range.x}{ The data range, employed to represent the mode tree.}
+  \item{range.bws}{ Employed bandwidths to compute the mode tree.}
+  \item{logbw}{ Logical value indicating if the bandwidths are given in the log10 scale.}
+  \item{sample.size}{ The number of non-missing observations in the sample used for obtaining the mode tree.}
+  \item{call}{ The unevaluated expression, which consists of the named function applied to the given arguments.}
 }
 \references{
 
