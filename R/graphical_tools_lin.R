@@ -1,4 +1,4 @@
-modetree=function(data,bws=NULL,gridsize=NULL,cbw1=NULL,cbw2=NULL,display=TRUE,logbw=FALSE,...){
+modetree=function(data,bws=NULL,gridsize=NULL,cbw1=NULL,cbw2=NULL,display=TRUE,logbw=FALSE,logbw.regulargrid=NULL,...){
 
   if (!is.numeric(data)) stop("Argument 'data' must be numeric")
   if (sum(is.na(data))>0) warning("Missing values were removed")
@@ -30,6 +30,30 @@ modetree=function(data,bws=NULL,gridsize=NULL,cbw1=NULL,cbw2=NULL,display=TRUE,l
   if (n > 512){n=2^ceiling(log2(n))}
   range.x=seq.int(min(data),max(data), length.out = n.user)
   range.data=range(data)
+
+
+  if(logbw!=T&logbw!=F){
+    warning("Argument 'logbw' must be T or F. Default value of 'logbw' was used")
+    logbw=F
+  }
+
+
+  if(logbw==F&!is.null(logbw.regulargrid)){
+    warning("Argument 'logbw.regulargrid' is not employed when 'logbw' is F")
+    logbw=T
+  }
+
+
+  if(is.null(logbw.regulargrid)){
+    logbw.regulargrid=F
+  }
+
+  if(logbw==T&(logbw.regulargrid!=T&logbw.regulargrid!=F)){
+    warning("Argument 'logbw.regulargrid' must be T or F. Default value of 'logbw.regulargrid' was used")
+    logbw.regulargrid=F
+  }
+
+
 
   if(!is.null(bws)&(!is.null(cbw1)|!is.null(cbw2))){warning("Arguments 'cbw1' and 'cbw2' are not needed when 'bws' are given")}
 
@@ -68,6 +92,10 @@ modetree=function(data,bws=NULL,gridsize=NULL,cbw1=NULL,cbw2=NULL,display=TRUE,l
       hmin=bw.crit(data,cbw2)
       hmax=bw.crit(data,cbw1)
       range.h=seq(hmin,hmax,len=gridsize[2])
+      if(logbw.regulargrid==T){
+        range.h=seq(log10(hmin),log10(hmax),len=gridsize[2])
+        range.h=10^range.h
+      }
     }
   }
 
@@ -86,6 +114,10 @@ modetree=function(data,bws=NULL,gridsize=NULL,cbw1=NULL,cbw2=NULL,display=TRUE,l
         hmin=bws[1]
         warning("A grid of 'bws' between the given ones were used")
         range.h=seq(hmin,hmax,len=gridsize[2])
+        if(logbw.regulargrid==T){
+          range.h=seq(log10(hmin),log10(hmax),len=gridsize[2])
+          range.h=10^range.h
+        }
       }
       if(length(bws)>2){
         hmax=max(bws)
@@ -103,6 +135,10 @@ modetree=function(data,bws=NULL,gridsize=NULL,cbw1=NULL,cbw2=NULL,display=TRUE,l
     hmin=2*min(diff(range.x))
     hmax=diff(range.data)
     range.h=seq(hmin,hmax,len=gridsize[2])
+    if(logbw.regulargrid==T){
+      range.h=seq(log10(hmin),log10(hmax),len=gridsize[2])
+      range.h=10^range.h
+    }
   }
 
   if(display!=T&display!=F){
@@ -110,10 +146,6 @@ modetree=function(data,bws=NULL,gridsize=NULL,cbw1=NULL,cbw2=NULL,display=TRUE,l
     display=T
   }
 
-  if(logbw!=T&logbw!=F){
-    warning("Argument 'logbw' must be T or F. Default value of 'logbw' was used")
-    logbw=F
-  }
 
   range.h=sort(range.h,decreasing=T)
   maxmodes=nmodes(data,range.h[length(range.h)],n=n)
@@ -315,12 +347,201 @@ plot.gtmod<-function(x,addplot=FALSE,xlab=NULL,ylab=NULL,col.lines="black",col.s
 ###############################################################
 
 
+summary.gtmod<-function(object, bandwidths=TRUE, digits = getOption("digits"), width=1, levelmf=NULL, ...){
+  stopifnot(is.numeric(object$range.x),is.numeric(object$range.bws),is.logical(object$logbw))
+
+  totnmodes=0
+
+  if(!is.null(object$locations)){
+
+    if(!is.null(levelmf)){
+      warning("Argument 'levelmf' is not employed for this method")
+    }
+
+   totnmodes=dim(object$locations)[2]
+   if(totnmodes>0){
+   modesval=matrix(0,nrow=totnmodes,ncol=2)
+   bandval=matrix(0,nrow=totnmodes,ncol=2)
+   for(i in 1:totnmodes){
+     modesval[i,]=range(object$locations[,i],na.rm=T)
+     bandval[i,]=range(object$range.bws[!is.na(object$locations[,i])])
+   }
+   }
+  }
+
+  if(!is.null(object$modeforest)){
+
+    if(is.null(levelmf)){
+      levelmf=0.5
+    }
+
+    estmodes=matrix(0,dim(object$modeforest)[1],dim(object$modeforest)[2])
+    modecand=rowSums(object$modeforest>levelmf)>0
+    wmodecand=which(modecand)
+    totnmodes=0
+    if(length(wmodecand)>0){
+    j=1
+    labelmode=1
+    i=wmodecand[1]
+    while(j<length(wmodecand)){
+     i=wmodecand[j]
+     estmodes[i,which(object$modeforest[i,]>levelmf)]=labelmode
+     j=j+1
+     dim2mf=dim(object$modeforest)[2]
+     cond1=(object$modeforest[i,]>levelmf)&(object$modeforest[i+1,]>levelmf)
+     cond2=(object$modeforest[i,1:(dim2mf-1)]>levelmf)&(object$modeforest[i+1,2:dim2mf]>levelmf)
+     cond3=(object$modeforest[i,2:dim2mf]>levelmf)&(object$modeforest[i+1,1:(dim2mf-1)]>levelmf)
+
+     while((sum(cond1)+sum(cond2)+sum(cond3))>0){
+       i=wmodecand[j]
+       estmodes[i,which(object$modeforest[i,]>levelmf)]=labelmode
+       j=j+1
+       dim2mf=dim(object$modeforest)[2]
+       cond1=(object$modeforest[i,]>levelmf)&(object$modeforest[i+1,]>levelmf)
+       cond2=(object$modeforest[i,1:(dim2mf-1)]>levelmf)&(object$modeforest[i+1,2:dim2mf]>levelmf)
+       cond3=(object$modeforest[i,2:dim2mf]>levelmf)&(object$modeforest[i+1,1:(dim2mf-1)]>levelmf)
+     }
+     labelmode=labelmode+1
+    }
+    totnmodes=max(estmodes)
+    modesval=matrix(0,nrow=totnmodes,ncol=2)
+    bandval=matrix(0,nrow=totnmodes,ncol=2)
+    diffrx=diff(object$range.x)[1]/2
+    for(i in 1:totnmodes){
+      modesval[i,]=range(object$range.x[which(rowSums(estmodes==i)>0)])
+      modesval[i,1]=modesval[i,1]-diffrx
+      modesval[i,2]=modesval[i,2]+diffrx
+      bandval[i,]=range(object$range.bws[which(colSums(estmodes==i)>0)])
+    }
+    orderestmodes=order(bandval[,2]-bandval[,1],decreasing=T)
+    modesval=modesval[orderestmodes,]
+    bandval=bandval[orderestmodes,]
+    }
+  }
+
+
+  if(!is.null(object$sizer)){
+
+    if(!is.null(levelmf)){
+      warning("Argument 'levelmf' is not employed for this method")
+    }
+
+    estmodes=matrix(0,dim(object$sizer)[1],dim(object$sizer)[2])
+    flatsizer=matrix(0,dim(object$sizer)[1],dim(object$sizer)[2])
+    for(i in 1:(dim(object$sizer)[2])){
+      wincreasing=which(object$sizer[,i]==3)
+      wdecreasing=which(object$sizer[,i]==1)
+      lastwinc=c(wincreasing[which(diff(wincreasing)>1)],wincreasing[length(wincreasing)])
+      wddec=which(diff(wdecreasing)>1)+1
+      wddec=c(1,wddec)
+      firstwdec=wdecreasing[wddec]
+      if(sum(is.na(lastwinc))){lastwinc=numeric()}
+      if(sum(is.na(firstwdec))){firstwdec=numeric()}
+      if((length(lastwinc)>0)&(length(firstwdec)>0)){
+        j=1
+        while(j<=length(firstwdec)){
+          if(sum(lastwinc<firstwdec[j])>0){
+            wlf=which(lastwinc<firstwdec[j])
+            startmode=lastwinc[wlf[length(wlf)]]
+            flatsizer[(startmode+1):(firstwdec[j]-1),i]=1
+            flw=firstwdec>lastwinc[wlf[length(wlf)]+1]
+            if(sum(flw,na.rm=T)==0){
+              j=length(firstwdec)+1
+            }else{
+              j=which(flw)[1]
+            }
+          }else{
+            j=j+1
+          }
+        }
+
+      }
+    }
+
+    modecand=rowSums(flatsizer)>0
+    wmodecand=which(modecand)
+    totnmodes=0
+    if(length(wmodecand)>0){
+      j=1
+      labelmode=1
+      i=wmodecand[1]
+      dim2mf=dim(object$sizer)[2]
+      while(j<length(wmodecand)){
+        i=wmodecand[j]
+        estmodes[i,which(flatsizer[i,]==1)]=labelmode
+        j=j+1
+        cond1=(flatsizer[i,]==1)&(flatsizer[i+1,]==1)
+        cond2=(flatsizer[i,1:(dim2mf-1)]==1)&(flatsizer[i+1,2:dim2mf]==1)
+        cond3=(flatsizer[i,2:dim2mf]==1)&(flatsizer[i+1,1:(dim2mf-1)]==1)
+
+        while((sum(cond1)+sum(cond2)+sum(cond3))>0){
+          i=wmodecand[j]
+          estmodes[i,which(flatsizer[i,]==1)]=labelmode
+          j=j+1
+          cond1=(flatsizer[i,]==1)&(flatsizer[i+1,]==1)
+          cond2=(flatsizer[i,1:(dim2mf-1)]==1)&(flatsizer[i+1,2:dim2mf]==1)
+          cond3=(flatsizer[i,2:dim2mf]==1)&(flatsizer[i+1,1:(dim2mf-1)]==1)
+
+        }
+        labelmode=labelmode+1
+      }
+      totnmodes=max(estmodes)
+      modesval=matrix(0,nrow=totnmodes,ncol=2)
+      bandval=matrix(0,nrow=totnmodes,ncol=2)
+      diffrx=diff(object$range.x)[1]/2
+      for(i in 1:totnmodes){
+        modesval[i,]=range(object$range.x[which(rowSums(estmodes==i)>0)])
+        modesval[i,1]=modesval[i,1]-diffrx
+        modesval[i,2]=modesval[i,2]+diffrx
+        bandval[i,]=range(object$range.bws[which(colSums(estmodes==i)>0)])
+      }
+      orderestmodes=order(bandval[,2]-bandval[,1],decreasing=T)
+      modesval=modesval[orderestmodes,]
+      bandval=bandval[orderestmodes,]
+    }
+  }
+
+  if(totnmodes>0){
+  cat("\nThe estimated modes are located between the following values")
+  if(bandwidths==TRUE){
+  if(object$logbw==T){
+  cat("\n(for the log10 bandwidths range indicated in parenthesis)\n")
+  }
+  if(object$logbw==F){
+    cat("\n(for the bandwidths range indicated in parenthesis)\n")
+  }
+  }
+    if(!is.matrix(modesval)){modesval=matrix(modesval,ncol=2)}
+    if(!is.matrix(bandval)){bandval=matrix(bandval,ncol=2)}
+  for(i in 1:totnmodes){
+    cat(paste("\nMode ", i,": ",sep=""),
+    paste(formatC(modesval[i,1], digits=digits,width=width,...),"|",formatC(modesval[i,2], digits=digits,width=width,...)))
+    if(bandwidths==TRUE){
+    cat(" (",formatC(bandval[i,1], digits=digits,width=width,...)," ",formatC(bandval[i,2], digits=digits,width=width,...),")",sep="")
+    }
+  }
+
+  cat("\n\n")
+  }else{
+    cat("\nNo modes were found according to the given criteria")
+  }
+}
+
+
+
+
+
+
+###############################################################
+###############################################################
+
+
 
 
 
 sizer=function(data,method=2,bws=NULL,gridsize=NULL,alpha=0.05,
                B=NULL,n0=NULL,cbw1=NULL,cbw2=NULL,display=TRUE,
-               logbw=TRUE,from=NULL,to=NULL,...){
+               logbw=TRUE,from=NULL,to=NULL,logbw.regulargrid=NULL,...){
 
   if (!is.numeric(data)) stop("Argument 'data' must be numeric")
   if (sum(is.na(data))>0) warning("Missing values were removed")
@@ -337,6 +558,21 @@ sizer=function(data,method=2,bws=NULL,gridsize=NULL,alpha=0.05,
   if(logbw!=T&logbw!=F){
     warning("Argument 'logbw' must be T or F. Default value of 'logbw' was used")
     logbw=T
+  }
+
+  if(logbw==F&!is.null(logbw.regulargrid)){
+    warning("Argument 'logbw.regulargrid' is not employed when 'logbw' is F")
+    logbw=T
+  }
+
+
+  if(is.null(logbw.regulargrid)){
+    logbw.regulargrid=F
+  }
+
+  if(logbw==T&(logbw.regulargrid!=T&logbw.regulargrid!=F)){
+    warning("Argument 'logbw.regulargrid' must be T or F. Default value of 'logbw.regulargrid' was used")
+    logbw.regulargrid=F
   }
 
 
@@ -440,6 +676,10 @@ sizer=function(data,method=2,bws=NULL,gridsize=NULL,alpha=0.05,
       hmin=bw.crit(data,cbw2)
       hmax=bw.crit(data,cbw1)
       range.h=seq(hmin,hmax,len=gridsize[2])
+      if(logbw.regulargrid==T){
+        range.h=seq(log10(hmin),log10(hmax),len=gridsize[2])
+        range.h=10^range.h
+      }
     }
   }
 
@@ -459,6 +699,10 @@ sizer=function(data,method=2,bws=NULL,gridsize=NULL,alpha=0.05,
         hmin=bws[1]
         warning("A grid of 'bws' between the given ones were used")
         range.h=seq(hmin,hmax,len=gridsize[2])
+        if(logbw.regulargrid==T){
+          range.h=seq(log10(hmin),log10(hmax),len=gridsize[2])
+          range.h=10^range.h
+        }
       }
       if(length(bws)>2){
         hmax=max(bws)
@@ -476,6 +720,10 @@ sizer=function(data,method=2,bws=NULL,gridsize=NULL,alpha=0.05,
     hmin=2*min(diff(range.x))
     hmax=diff(range.data)
     range.h=seq(hmin,hmax,len=gridsize[2])
+    if(logbw.regulargrid==T){
+      range.h=seq(log10(hmin),log10(hmax),len=gridsize[2])
+      range.h=10^range.h
+    }
   }
 
 
@@ -695,7 +943,7 @@ sizer=function(data,method=2,bws=NULL,gridsize=NULL,alpha=0.05,
 
 
 
-modeforest=function(data,bws=NULL,gridsize=NULL,B=99,n=512,cbw1=NULL,cbw2=NULL,display=TRUE,logbw=FALSE,from=NULL,to=NULL,...){
+modeforest=function(data,bws=NULL,gridsize=NULL,B=99,n=512,cbw1=NULL,cbw2=NULL,display=TRUE,logbw=FALSE,from=NULL,to=NULL,logbw.regulargrid=NULL,...){
 
   if (!is.numeric(data)) stop("Argument 'data' must be numeric")
   if (sum(is.na(data))>0) warning("Missing values were removed")
@@ -712,6 +960,22 @@ modeforest=function(data,bws=NULL,gridsize=NULL,B=99,n=512,cbw1=NULL,cbw2=NULL,d
   if(logbw!=T&logbw!=F){
     warning("Argument 'logbw' must be T or F. Default value of 'logbw' was used")
     logbw=T
+  }
+
+
+  if(logbw==F&!is.null(logbw.regulargrid)){
+    warning("Argument 'logbw.regulargrid' is not employed when 'logbw' is F")
+    logbw=T
+  }
+
+
+  if(is.null(logbw.regulargrid)){
+    logbw.regulargrid=F
+  }
+
+  if(logbw==T&(logbw.regulargrid!=T&logbw.regulargrid!=F)){
+    warning("Argument 'logbw.regulargrid' must be T or F. Default value of 'logbw.regulargrid' was used")
+    logbw.regulargrid=F
   }
 
   if(is.null(gridsize)){
@@ -818,6 +1082,10 @@ modeforest=function(data,bws=NULL,gridsize=NULL,B=99,n=512,cbw1=NULL,cbw2=NULL,d
       hmin=bw.crit(data,cbw2)
       hmax=bw.crit(data,cbw1)
       range.h=seq(hmin,hmax,len=gridsize[2])
+      if(logbw.regulargrid==T){
+        range.h=seq(log10(hmin),log10(hmax),len=gridsize[2])
+        range.h=10^range.h
+      }
     }
   }
 
@@ -837,6 +1105,10 @@ modeforest=function(data,bws=NULL,gridsize=NULL,B=99,n=512,cbw1=NULL,cbw2=NULL,d
         hmin=bws[1]
         warning("A grid of 'bws' between the given ones were used")
         range.h=seq(hmin,hmax,len=gridsize[2])
+        if(logbw.regulargrid==T){
+          range.h=seq(log10(hmin),log10(hmax),len=gridsize[2])
+          range.h=10^range.h
+        }
       }
       if(length(bws)>2){
         hmax=max(bws)
@@ -854,6 +1126,10 @@ modeforest=function(data,bws=NULL,gridsize=NULL,B=99,n=512,cbw1=NULL,cbw2=NULL,d
     hmin=2*min(diff(range.x))
     hmax=diff(range.data)
     range.h=seq(hmin,hmax,len=gridsize[2])
+    if(logbw.regulargrid==T){
+      range.h=seq(log10(hmin),log10(hmax),len=gridsize[2])
+      range.h=10^range.h
+    }
   }
 
   if (!is.numeric(B)){
@@ -960,10 +1236,6 @@ modeforest=function(data,bws=NULL,gridsize=NULL,B=99,n=512,cbw1=NULL,cbw2=NULL,d
 
 
 }
-
-
-
-
 
 
 

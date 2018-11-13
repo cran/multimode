@@ -51,7 +51,7 @@ The NAs will be automatically removed.
 }
 \references{
 
-Ameijeiras--Alonso, J., Crujeiras, R.M. and Rodríguez--Casal, A. (2016). Mode testing, critical bandwidth and excess mass, \emph{arXiv preprint: 1609.05188}.
+Jose Ameijeiras--Alonso, Rosa M. Crujeiras, Alberto Rodríguez--Casal (2018). Mode testing, critical bandwidth and excess mass, to appear in \emph{Test}.
 
 Hall, P. and York, M. (2001).  On the calibration of Silverman's test for multimodality, \emph{Statistica Sinica}, \bold{11}, 515--536.
 

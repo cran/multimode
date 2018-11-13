@@ -8,7 +8,7 @@
 }
 \usage{
 sizer(data,method=2,bws=NULL,gridsize=NULL,alpha=0.05,B=NULL,n0=NULL,
-cbw1=NULL,cbw2=NULL,display=TRUE,logbw=TRUE,from=NULL,to=NULL,\dots)
+cbw1=NULL,cbw2=NULL,display=TRUE,logbw=TRUE,from=NULL,to=NULL,logbw.regulargrid=NULL,\dots)
 }
 \arguments{
   \item{data}{ Sample in which the SiZer map is computed.}
@@ -21,10 +21,11 @@ cbw1=NULL,cbw2=NULL,display=TRUE,logbw=TRUE,from=NULL,to=NULL,\dots)
   \item{cbw1}{ Number of modes for which the first critical bandwidth is calculated. This is the first bandwidth used to compute the SiZer map when \code{bws} is not specified.}
   \item{cbw2}{ Number of modes for which the second critical bandwidth is calculated. This is the last bandwidth used to compute the SiZer map when \code{bws} is not specified.}
   \item{display}{ Logical, if \code{TRUE} the SiZer map is plotted. Default \code{TRUE}.}
-  \item{logbw}{ Logical, if \code{TRUE} the plot displays and returns the log10 bandwidths. Default \code{logbw=FALSE}.}
+  \item{logbw}{ Logical, if \code{TRUE} the plot displays and returns the log10 bandwidths. Default \code{logbw=TRUE}.}
     \item{from}{ First plotted value of the variable. Default is below the data minimum.}
     \item{to}{ Last plotted value of the variable. Default is above the data maximum.}
-    \item{\dots}{ Arguments to be passed to subsequent methods, \code{\link{plot.gtmod}} for the \code{plot} and \code{print} methods.}
+    \item{logbw.regulargrid}{ Logical, if \code{TRUE} a regular grid of bandwidths is created over the log10 scale. Default \code{logbw.regulargrid=FALSE}.}
+    \item{\dots}{ Arguments to be passed to subsequent methods, \code{\link{plot.gtmod}} for the \code{plot}, \code{print} and \code{summary} methods.}
 }
 
 \details{

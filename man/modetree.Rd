@@ -8,7 +8,7 @@
 }
 \usage{
 modetree(data,bws=NULL,gridsize=NULL,cbw1=NULL,cbw2=NULL,display=TRUE,
-logbw=FALSE,\dots)
+logbw=FALSE,logbw.regulargrid=NULL,\dots)
 }
 \arguments{
   \item{data}{ Sample in which the mode tree is computed.}
@@ -18,7 +18,8 @@ logbw=FALSE,\dots)
   \item{cbw2}{ Number of modes for which the second critical bandwidth is calculated. This is the last bandwidth used to compute the mode tree when \code{bws} is not specified.}
   \item{display}{ Logical, if \code{TRUE} the mode tree plot is plotted. Default \code{TRUE}.}
   \item{logbw}{ Logical, if \code{TRUE} the plot displays and returns the log10 bandwidths. Default \code{logbw=FALSE}.}
-  \item{\dots}{ Arguments to be passed to subsequent methods, \code{\link{plot.gtmod}} for the \code{plot} and \code{print} methods.}
+  \item{logbw.regulargrid}{ Logical, if \code{TRUE} a regular grid of bandwidths is created over the log10 scale. Default \code{logbw.regulargrid=FALSE}.}
+  \item{\dots}{ Arguments to be passed to subsequent methods, \code{\link{plot.gtmod}} for the \code{plot}, \code{print} and \code{summary} methods.}
 }
 
 \details{

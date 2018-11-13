@@ -8,7 +8,7 @@
 \title{ Stamps thickness
 }
 \description{
-This dataset, analysed in Izenman and Sommer (1988) and Ameijeiras--Alonso \emph{et al.} (2017), consists of thickness measurements (in millimeters) of 485 unwatermarked used white wove stamps of the 1872 Hidalgo stamp issue of Mexico. All of them had an overprint with the year (1872 or either an 1873 or 1874) and some of them were watermarked (Papel Sellado or LA+-F).
+This dataset, analysed in Izenman and Sommer (1988) and Ameijeiras--Alonso \emph{et al.} (2018), consists of thickness measurements (in millimeters) of 485 unwatermarked used white wove stamps of the 1872 Hidalgo stamp issue of Mexico. All of them had an overprint with the year (1872 or either an 1873 or 1874) and some of them were watermarked (Papel Sellado or LA+-F).
 }
 \usage{
 data(stamps)
@@ -27,7 +27,7 @@ Obtained from the original table in Izenman and Sommer (1988).
 }
 \references{
 
-Ameijeiras--Alonso, J., Crujeiras, R.M. and Rodríguez--Casal, A. (2016). Mode testing, critical bandwidth and excess mass, \emph{arXiv preprint: 1609.05188}.
+Jose Ameijeiras--Alonso, Rosa M. Crujeiras, Alberto Rodríguez--Casal (2018). Mode testing, critical bandwidth and excess mass, to appear in \emph{Test}.
 
 Izenman, A. J., and Sommer, C. J. (1988). Philatelic mixtures and multimodal densities. \emph{Journal of the American Statistical association}, \bold{83}, 941--953.
 

@@ -14,7 +14,7 @@ nMC=NULL,BMC=NULL)
 \arguments{
   \item{data}{ Sample to be tested.}
   \item{mod0}{ The maximum number of modes in the null hypothesis. Default \code{mod0=1} (unimodality vs. multimodality test).}
-  \item{method}{ The method employed for testing the number of modes. Available methods are: SI (Silverman, 1981), HY (Hall and York, 2001), FM (Fisher and Marron, 2001), HH (Hartigan and Hartigan, 1985), CH (Cheng and Hall,1998), ACR (Ameijeiras--Alonso \emph{et al.}, 2016). Default \code{method="ACR"}.}
+  \item{method}{ The method employed for testing the number of modes. Available methods are: SI (Silverman, 1981), HY (Hall and York, 2001), FM (Fisher and Marron, 2001), HH (Hartigan and Hartigan, 1985), CH (Cheng and Hall,1998), ACR (Ameijeiras--Alonso \emph{et al.}, 2018). Default \code{method="ACR"}.}
   \item{B}{ Number of replicates used in the test. Default \code{B=500}.}
   \item{lowsup}{ Lower limit for the random variable support in the computation of the  critical bandwidth. Default is \code{-Inf}.}
   \item{uppsup}{ Upper limit for the random variable support in the computation of the critical bandwidth. Default is \code{Inf}.}
@@ -69,7 +69,7 @@ modetest(data,method="HY",B=500,lowsup=-1.5,uppsup=1.5,submethod=2,
 n=NULL,tol=NULL,nMC=NULL,BMC=NULL)
 }
 
-A modification of the proposal of Ameijeiras--Alonso \emph{et al.} (2016) can be also applied, by setting \code{method=ACR} and including a known compact support for detecting the modes. The parameter \code{tol2} is the accuracy required in the integration of the calibration function. For more information, see Ameijeiras--Alonso \emph{et al.} (2016), the default approach, when the support is unknown, is given in Section 2.3 and, when it is provided, the approach shown in the Appendix B is employed.
+A modification of the proposal of Ameijeiras--Alonso \emph{et al.} (2018) can be also applied, by setting \code{method=ACR} and including a known compact support for detecting the modes. The parameter \code{tol2} is the accuracy required in the integration of the calibration function. For more information, see Ameijeiras--Alonso \emph{et al.} (2018), the default approach, when the support is unknown, is given in Section 2.3 and, when it is provided, the approach shown in the Appendix B is employed.
 
 Typical usage is
 
@@ -96,7 +96,7 @@ A list with class \code{"htest"} containing the following components:
   }
 \references{
 
-Jose Ameijeiras--Alonso, Rosa M. Crujeiras, Alberto Rodríguez--Casal (2016). Mode testing, critical bandwidth and excess mass, \emph{arXiv preprint: 1609.05188}.
+Jose Ameijeiras--Alonso, Rosa M. Crujeiras, Alberto Rodríguez--Casal (2018). Mode testing, critical bandwidth and excess mass, to appear in \emph{Test}.
 
 Cheng, M. Y. and Hall, P. (1998). Calibrating the excess mass and dip tests of modality, \emph{Journal of the Royal Statistical Society. Series B}, \bold{60}, 579--589.
 

@@ -8,14 +8,14 @@ Mode testing and exploring.
 }
 
 \description{
-Different examples and methods for testing (including different proposals described in Ameijeiras-Alonso et al., 2016 <arXiv:1609.05188>) and exploring (including the mode tree, mode forest and SiZer map) the number of modes using nonparametric techniques.
+Different examples and methods for testing (including different proposals described in Ameijeiras-Alonso et al., 2018 <DOI:10.1007/s11749-018-0611-5>) and exploring (including the mode tree, mode forest and SiZer map) the number of modes using nonparametric techniques.
 }
 \details{
 \tabular{ll}{
 Package: \tab multimode\cr
 Type: \tab Package\cr
-Version: \tab 1.3\cr
-Date: \tab 2018-06-08\cr
+Version: \tab 1.4\cr
+Date: \tab 2018-11-12\cr
 License: \tab GPL-3\cr
 NeedsCompilation: \tab yes\cr
 LazyData: \tab yes\cr
@@ -28,9 +28,9 @@ For a complete list of functions, use \code{library(help="multimode")}.
 }
 
 \references{
-Ameijeiras--Alonso, J., Crujeiras, R.M. and Rodríguez--Casal, A. (2016). Mode testing, critical bandwidth and excess mass, \emph{arXiv preprint: 1609.05188}.
+Jose Ameijeiras--Alonso, Rosa M. Crujeiras, Alberto Rodríguez--Casal (2018a). Mode testing, critical bandwidth and excess mass, to appear in \emph{Test}.
 
-Ameijeiras--Alonso, J., Crujeiras, R.M. and Rodríguez--Casal, A. (2018). multimode: An R Package for Mode Assessment, \emph{arXiv preprint: 1803.00472}.
+Ameijeiras--Alonso, J., Crujeiras, R.M. and Rodríguez--Casal, A. (2018b). multimode: An R Package for Mode Assessment, \emph{arXiv preprint: 1803.00472}.
 
 Chaudhuri, P. and Marron, J. S. (1999). SiZer for exploration of structures in curves, \emph{ Journal of the American Statistical Association}, \bold{94}, 807--823.
 

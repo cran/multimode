@@ -8,7 +8,7 @@
 }
 \usage{
 modeforest(data,bws=NULL,gridsize=NULL,B=99,n=512,cbw1=NULL,cbw2=NULL,
-display=TRUE,logbw=FALSE,from=NULL,to=NULL,\dots)
+display=TRUE,logbw=FALSE,from=NULL,to=NULL,logbw.regulargrid=NULL,\dots)
 }
 \arguments{
   \item{data}{ Sample in which the mode forest is computed.}
@@ -22,7 +22,8 @@ display=TRUE,logbw=FALSE,from=NULL,to=NULL,\dots)
   \item{logbw}{ Logical, if \code{TRUE} the plot displays and returns the log10 bandwidths. Default \code{logbw=FALSE}.}
     \item{from}{ First plotted value of the variable. Default is below the data minimum.}
     \item{to}{ Last plotted value of the variable. Default is above the data maximum.}
-    \item{\dots}{ Arguments to be passed to subsequent methods, \code{\link{plot.gtmod}} for the \code{plot} and \code{print} methods.}
+    \item{logbw.regulargrid}{ Logical, if \code{TRUE} a regular grid of bandwidths is created over the log10 scale. Default \code{logbw.regulargrid=FALSE}.}
+    \item{\dots}{ Arguments to be passed to subsequent methods, \code{\link{plot.gtmod}} for the \code{plot}, \code{print} and \code{summary} methods.}
 }
 
 \details{
