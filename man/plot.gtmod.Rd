@@ -36,7 +36,14 @@ poslegend = "topright", \dots)
   \item{\dots}{ Arguments to be passed to subsequent methods, \code{\link[graphics]{plot.default}} (\code{\link{modetree}}) or \code{\link[graphics]{image.default}} (\code{\link{modeforest}} and \code{\link{sizer}}) for the \code{plot} method and \code{\link[base]{formatC}} for the \code{print} and the \code{summary} method.}
 }
 
-\author{ Jose Ameijeiras--Alonso, Rosa M. Crujeiras and Alberto Rodríguez--Casal}
+\references{
+
+Ameijeiras-Alonso, J., Crujeiras, R.M. and Rodríguez-Casal, A. (2021). multimode: An R Package for Mode Assessment, \emph{Journal of Statistical Software}, \bold{97}, 1--32.
+
+}
+
+
+\author{ Jose Ameijeiras-Alonso, Rosa M. Crujeiras and Alberto Rodríguez-Casal}
 
 \seealso{
 \code{\link{modetree}}, \code{\link{modeforest}} and \code{\link{sizer}}, also for examples.

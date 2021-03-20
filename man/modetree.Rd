@@ -44,7 +44,7 @@ Minnotte, M. C. and Scott, D. W. (1993). The mode tree: A tool for visualization
 }
 
 
-\author{ Jose Ameijeiras--Alonso, Rosa M. Crujeiras and Alberto Rodríguez--Casal}
+\author{ Jose Ameijeiras-Alonso, Rosa M. Crujeiras and Alberto Rodríguez-Casal}
 
 \examples{
 #Mode tree using a grid of bandwidths between 0.2 and 0.5

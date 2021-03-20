@@ -20,7 +20,7 @@ Obtained from the Supplementary material of Richardson and Green (1997), availab
 }
 \references{
 
-Bechtel, Y. C., Bonaiti--Pellie, C., Poisson, N., Magnette, J. and Bechtel, P. R. (1993). A population and family study N--acetyltransferase using caffeine urinary metabolites. \emph{Clinical Pharmacology and Therapeutics}, \bold{54}, 134--141.
+Bechtel, Y. C., Bonaiti-Pellie, C., Poisson, N., Magnette, J. and Bechtel, P. R. (1993). A population and family study N--acetyltransferase using caffeine urinary metabolites. \emph{Clinical Pharmacology and Therapeutics}, \bold{54}, 134--141.
 
 Richardson, S. and Green, P. J. (1997). On Bayesian analysis of mixtures with unknown number of components (with discussion). \emph{Journal of the Royal Statistical Society, Series B}, \bold{59}, 731--792.
 

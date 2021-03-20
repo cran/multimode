@@ -48,7 +48,7 @@ Minnotte, M. C., Marchette, D. J. and Wegman, E. J. (1998). The bumpy road to th
 }
 
 
-\author{ Jose Ameijeiras--Alonso, Rosa M. Crujeiras and Alberto Rodríguez--Casal}
+\author{ Jose Ameijeiras-Alonso, Rosa M. Crujeiras and Alberto Rodríguez-Casal}
 
 \examples{
 #Mode forest using a grid of bandwidths between 0.2 and 0.5 and 29 bootstrap replicas

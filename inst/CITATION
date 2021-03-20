@@ -1,16 +1,18 @@
-citHeader("To cite NPCirc in publications use:")
+bibentry(bibtype = "Article",
+  title        = "{multimode}: An {R} Package for Mode Assessment",
+  author       = c(person(given = "Jose",
+                          family = "Ameijeiras-Alonso"),
+                   person(given = c("Rosa", "M."),
+                          family = "Crujeiras"),
+                   person(given = "Alberto",
+                          family = "Rodr{\\'i}guez-Casal")),
+  journal      = "Journal of Statistical Software",
+  year         = "2021",
+  volume       = "97",
+  number       = "9",
+  pages        = "1--32",
+  doi          = "10.18637/jss.v097.i09",
 
-citEntry(entry = "Article",
-  title        = "multimode: An {R} Package for Mode Assessment",
-  author       = personList(as.person("Jose Ameijeiras-Alonso"),
-                   as.person("Rosa M. Crujeiras"),
-                   as.person("Alberto Rodr{\\'i}guez-Casal")),
-  journal      = "arXiv preprint arXiv: 1803.00472",
-  year         = "2018",
-  url          = "https://arxiv.org/abs/1803.00472",
-
-  textVersion  =
-  paste("Jose Ameijeiras-Alonso, Rosa M. Crujeiras, Alberto Rodriguez-Casal (2018).",
-        "multimode: An R Package for Mode Assessment.",
-        "arXiv preprint arXiv: 1803.00472.")
+  header       = "To cite multimode in publications use:"
 )
+

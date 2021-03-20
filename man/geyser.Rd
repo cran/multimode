@@ -26,7 +26,7 @@ Obtained from the original tables in Azzalini and Bowman (1990), Härdle (2012) 
 }
 \references{
 
-Azzalini, A. and Bowman, A. W. (1990). A look at some data on the Old Faithful geyser. \emph{Applied Statistics}, \bold{39}, 357-365.
+Azzalini, A. and Bowman, A. W. (1990). A look at some data on the Old Faithful geyser. \emph{Applied Statistics}, \bold{39}, 357--365.
 
 Härdle, W. (1991). \emph{Smoothing techniques: with implementation in S}. New York: Springer-Verlag.
 

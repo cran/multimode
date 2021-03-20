@@ -51,7 +51,9 @@ The NAs will be automatically removed.
 }
 \references{
 
-Jose Ameijeiras--Alonso, Rosa M. Crujeiras, Alberto Rodríguez--Casal (2018). Mode testing, critical bandwidth and excess mass, to appear in \emph{Test}.
+Ameijeiras-Alonso, J., Crujeiras, R.M. and Rodríguez-Casal, A. (2019). Mode testing, critical bandwidth and excess mass, \emph{Test}, \bold{28}, 900--919.
+
+Ameijeiras-Alonso, J., Crujeiras, R.M. and Rodríguez-Casal, A. (2021). multimode: An R Package for Mode Assessment, \emph{Journal of Statistical Software}, \bold{97}, 1--32.
 
 Hall, P. and York, M. (2001).  On the calibration of Silverman's test for multimodality, \emph{Statistica Sinica}, \bold{11}, 515--536.
 
@@ -59,7 +61,7 @@ Silverman, B. W. (1981). Using kernel density estimates to investigate multimoda
 
 }
 
-\author{ Jose Ameijeiras--Alonso, Rosa M. Crujeiras and Alberto Rodríguez--Casal}
+\author{ Jose Ameijeiras-Alonso, Rosa M. Crujeiras and Alberto Rodríguez-Casal}
 
 \examples{
 # Testing for unimodality

@@ -33,7 +33,13 @@ The NAs will be automatically removed.
   \item{fny}{ The estimated density values.}
 }
 
-\author{ Jose Ameijeiras--Alonso, Rosa M. Crujeiras and Alberto Rodríguez--Casal}
+\references{
+
+Ameijeiras-Alonso, J., Crujeiras, R.M. and Rodríguez-Casal, A. (2021). multimode: An R Package for Mode Assessment, \emph{Journal of Statistical Software}, \bold{97}, 1--32.
+
+}
+
+\author{ Jose Ameijeiras-Alonso, Rosa M. Crujeiras and Alberto Rodríguez-Casal}
 
 \examples{
 # Number of modes in the interval (-1.5,1.5), using the bandwidth 0.5.

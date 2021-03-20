@@ -1884,7 +1884,7 @@ modetest=function(data,mod0=1,method="ACR",B=500,lowsup=-Inf,uppsup=Inf,submetho
     namestatistic="Excess mass"
   }else if (method=="ACR"){
     pval=emcbw(data,mod0,B,submethod,lowsup,uppsup,n,tol,tol2,gridsize)
-    namemethod="Ameijeiras-Alonso et al. (2018) excess mass test"
+    namemethod="Ameijeiras-Alonso et al. (2019) excess mass test"
     namestatistic="Excess mass"
   }
 

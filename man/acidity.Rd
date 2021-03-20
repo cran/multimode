@@ -2,16 +2,16 @@
 \name{acidity}
 \alias{acidity}
 \docType{data}
-\title{ Acid--neutralizing capacity }
+\title{ Acid-neutralizing capacity }
 \description{
-This dataset, analyzed by Crawford (1994), contains the Acid--Neutralizing Capacity (ANC) measured in a sample of 155
-lakes in North--Central Wisconsin (USA). ANC describes the capability of a lake to absorb acid, where low ANC values may lead to a loss of biological resources.
+This dataset, analyzed by Crawford (1994), contains the Acid-Neutralizing Capacity (ANC) measured in a sample of 155
+lakes in North-Central Wisconsin (USA). ANC describes the capability of a lake to absorb acid, where low ANC values may lead to a loss of biological resources.
 }
 \usage{
 data(acidity)
 }
 \format{
-  \code{acidity} includes an acidity index of lakes in north--central Wisconsin on the log scale, in particular, it is provided the log(ANC+50) as in Crawford (1994).
+  \code{acidity} includes an acidity index of lakes in north-central Wisconsin on the log scale, in particular, it is provided the log(ANC+50) as in Crawford (1994).
 }
 \details{
 This is a classic example for determining the number of modes.

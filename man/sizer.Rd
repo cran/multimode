@@ -54,12 +54,14 @@ The NAs will be automatically removed.
 }
 \references{
 
+Ameijeiras-Alonso, J., Crujeiras, R.M. and Rodríguez-Casal, A. (2021). multimode: An R Package for Mode Assessment, \emph{Journal of Statistical Software}, \bold{97}, 1--32.
+
 Chaudhuri, P. and Marron, J. S. (1999). SiZer for exploration of structures in curves, \emph{ Journal of the American Statistical Association}, \bold{94}, 807--823.
 
 }
 
 
-\author{ Jose Ameijeiras--Alonso, Rosa M. Crujeiras and Alberto Rodríguez--Casal}
+\author{ Jose Ameijeiras-Alonso, Rosa M. Crujeiras and Alberto Rodríguez-Casal}
 
 \examples{
 #SiZer map using a grid of bandwidths between 1 and 10

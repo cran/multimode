@@ -22,7 +22,7 @@ Obtained from the Table 1 of Postman \emph{et al.} (1986), Table 1 of Roeder (19
 }
 \references{
 
-Postman, M., Huchra, J. P. and Geller, M. J. (1986). Probes of large--scale structures in the Corona Borealis region. \emph{Astronomical Journal}, \bold{92}, 1238--1247.
+Postman, M., Huchra, J. P. and Geller, M. J. (1986). Probes of large-scale structures in the Corona Borealis region. \emph{Astronomical Journal}, \bold{92}, 1238--1247.
 
 Richardson, S. and Green, P. J. (1997). On Bayesian analysis of mixtures with unknown number of components (with discussion). \emph{Journal of the Royal Statistical Society, Series B}, \bold{59}, 731--792.
 

@@ -43,7 +43,7 @@ Silverman, B. W. (1981). Using kernel density estimates to investigate multimoda
 
 }
 
-\author{ Jose Ameijeiras--Alonso, Rosa M. Crujeiras and Alberto Rodríguez--Casal}
+\author{ Jose Ameijeiras-Alonso, Rosa M. Crujeiras and Alberto Rodríguez-Casal}
 
 \examples{
 # Critical bandwidth of Silverman (1981) for one mode.

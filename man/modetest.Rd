@@ -14,7 +14,7 @@ nMC=NULL,BMC=NULL)
 \arguments{
   \item{data}{ Sample to be tested.}
   \item{mod0}{ The maximum number of modes in the null hypothesis. Default \code{mod0=1} (unimodality vs. multimodality test).}
-  \item{method}{ The method employed for testing the number of modes. Available methods are: SI (Silverman, 1981), HY (Hall and York, 2001), FM (Fisher and Marron, 2001), HH (Hartigan and Hartigan, 1985), CH (Cheng and Hall,1998), ACR (Ameijeiras--Alonso \emph{et al.}, 2018). Default \code{method="ACR"}.}
+  \item{method}{ The method employed for testing the number of modes. Available methods are: SI (Silverman, 1981), HY (Hall and York, 2001), FM (Fisher and Marron, 2001), HH (Hartigan and Hartigan, 1985), CH (Cheng and Hall,1998), ACR (Ameijeiras-Alonso \emph{et al.}, 2019). Default \code{method="ACR"}.}
   \item{B}{ Number of replicates used in the test. Default \code{B=500}.}
   \item{lowsup}{ Lower limit for the random variable support in the computation of the  critical bandwidth. Default is \code{-Inf}.}
   \item{uppsup}{ Upper limit for the random variable support in the computation of the critical bandwidth. Default is \code{Inf}.}
@@ -25,7 +25,7 @@ nMC=NULL,BMC=NULL)
   \item{gridsize}{ When the approximated version of the excess mass is employed in \code{method} ACR, number of endpoints at which the \eqn{C_m(\lambda)} sets are estimated (first element) and number of possible values of \eqn{\lambda} (second element). Default is \code{gridsize=c(20,20)}.}
   \item{alpha}{ Significance level employed for testing unimodality when method 1 of Hall and York (2001) is used. Default \code{alpha=0.05}.}
   \item{nMC}{ Number of Monte Carlo replicates used to approximate the p-value in the method 2 of Hall and York (2001). Default \code{nMC=100}.}
-  \item{BMC}{ Number of bootstrap replicas used for computing the p--value in each Monte Carlo replicate of the Hall and York (2001) method 2. Default \code{BMC=100}.}
+  \item{BMC}{ Number of bootstrap replicas used for computing the p-value in each Monte Carlo replicate of the Hall and York (2001) method 2. Default \code{BMC=100}.}
   }
 \details{
 The number of modes for the underlying density of a sample given by \code{data} can be tested with \code{modetest}. The null hypothesis states that the sample has \code{mod0} modes, and the alternative hypothesis is if it has more modes. The test used for calculating the p-value is specified in \code{method}. All the available proposals require bootstrap or Monte Carlo resamples (number specified in \code{B}).
@@ -57,7 +57,7 @@ Typical usage is
 modetest(data,mod0=1,method="SI",B=500,submethod=NULL,n=NULL,tol=NULL)
 }
 
-If a compact support containing a mode is known, it can be used to compute the Hall and York (2001) critical bandwidth. Note that in the case of the test proposed by Hall and York (2001), this support should be known, unless the support of the density function is bounded. For their proposal, two methods are implemented. \code{submethod} 1 is an asymptotic correction of Silverman (1981) test based on the limiting distribution of the test statistic. When \code{submethod=1}, the significance level must be previously determined with \code{alpha}. \code{submethod} 2 is based on Monte Carlo techniques. For this reason, when \code{submethod=2}, the number of replicates (\code{nMC}) and the number of bootstrap replicates (\code{BMC}) used for computing the p--value in each Monte Carlo replicate are needed.
+If a compact support containing a mode is known, it can be used to compute the Hall and York (2001) critical bandwidth. Note that in the case of the test proposed by Hall and York (2001), this support should be known, unless the support of the density function is bounded. For their proposal, two methods are implemented. \code{submethod} 1 is an asymptotic correction of Silverman (1981) test based on the limiting distribution of the test statistic. When \code{submethod=1}, the significance level must be previously determined with \code{alpha}. \code{submethod} 2 is based on Monte Carlo techniques. For this reason, when \code{submethod=2}, the number of replicates (\code{nMC}) and the number of bootstrap replicates (\code{BMC}) used for computing the p-value in each Monte Carlo replicate are needed.
 
 Typical usages are
 
@@ -69,7 +69,7 @@ modetest(data,method="HY",B=500,lowsup=-1.5,uppsup=1.5,submethod=2,
 n=NULL,tol=NULL,nMC=NULL,BMC=NULL)
 }
 
-A modification of the proposal of Ameijeiras--Alonso \emph{et al.} (2018) can be also applied, by setting \code{method=ACR} and including a known compact support for detecting the modes. The parameter \code{tol2} is the accuracy required in the integration of the calibration function. For more information, see Ameijeiras--Alonso \emph{et al.} (2018), the default approach, when the support is unknown, is given in Section 2.3 and, when it is provided, the approach shown in the Appendix B is employed.
+A modification of the proposal of Ameijeiras-Alonso \emph{et al.} (2019) can be also applied, by setting \code{method=ACR} and including a known compact support for detecting the modes. The parameter \code{tol2} is the accuracy required in the integration of the calibration function. For more information, see Ameijeiras-Alonso \emph{et al.} (2019), the default approach, when the support is unknown, is given in Section 2.3 and, when it is provided, the approach shown in the Appendix B is employed.
 
 Typical usage is
 
@@ -96,7 +96,9 @@ A list with class \code{"htest"} containing the following components:
   }
 \references{
 
-Jose Ameijeiras--Alonso, Rosa M. Crujeiras, Alberto Rodríguez--Casal (2018). Mode testing, critical bandwidth and excess mass, to appear in \emph{Test}.
+Ameijeiras-Alonso, J., Crujeiras, R.M. and Rodríguez-Casal, A. (2019). Mode testing, critical bandwidth and excess mass, \emph{Test}, \bold{28}, 900--919.
+
+Ameijeiras-Alonso, J., Crujeiras, R.M. and Rodríguez-Casal, A. (2021). multimode: An R Package for Mode Assessment, \emph{Journal of Statistical Software}, \bold{97}, 1--32.
 
 Cheng, M. Y. and Hall, P. (1998). Calibrating the excess mass and dip tests of modality, \emph{Journal of the Royal Statistical Society. Series B}, \bold{60}, 579--589.
 
@@ -112,7 +114,7 @@ Silverman, B. W. (1981). Using kernel density estimates to investigate multimoda
 
 }
 
-\author{ Jose Ameijeiras--Alonso, Rosa M. Crujeiras and Alberto Rodríguez--Casal}
+\author{ Jose Ameijeiras-Alonso, Rosa M. Crujeiras and Alberto Rodríguez-Casal}
 
 \examples{
 # Testing for unimodality
